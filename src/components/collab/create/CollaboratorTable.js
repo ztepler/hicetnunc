@@ -30,7 +30,7 @@ export const CollaboratorTable = ({ collaborators, setCollaborators, availableSh
     const onUpdate = (index, collabData) => {
         const updatedCollabs = [...collaborators]
 
-        if (updatedCollabs.some(collaborator => collaborator.address === collabData.address)) {
+        if (updatedCollabs.length > 1 && updatedCollabs.some((collaborator, i) => collaborator.address === collabData.address && i !== index)) {
             console.log("Address exists")
         } else {
             updatedCollabs[index] = collabData
