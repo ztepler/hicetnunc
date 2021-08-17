@@ -6,13 +6,13 @@ import { AddCollaboratorsButton } from '../../../components/collab/create/AddCol
 import { ReviewStage } from '../../../components/collab/create/ReviewStage'
 import styles from '../styles.module.scss'
 import classNames from 'classnames'
-import { mockData } from '../../../components/collab/constants'
+// import { mockData } from '../../../components/collab/constants'
 
 export const CreateCollaboration = () => {
 
     // Core collaborators and benefactors
     const [editCollaborators, setEditCollaborators] = useState(true)
-    const [collaborators, setCollaborators] = useState(mockData)
+    const [collaborators, setCollaborators] = useState([])
     const [benefactors, setBenefactors] = useState([])
 
     // For adding people not directly involved with the creation
@@ -48,8 +48,8 @@ export const CreateCollaboration = () => {
         const benefactor = benefactors[index]
         const updatedBenefactors = [...benefactors]
 
-        console.log("_calculateShares", index, percentage);
-
+        console.log("_calculateShares", index, percentage)
+        
         updatedBenefactors[index] = {
             ...benefactor,
             shares: Math.ceil(totalShares * percentage / 100),
@@ -74,7 +74,6 @@ export const CreateCollaboration = () => {
     }
 
     const totalParticipants = validCollaborators.length + benefactors.length
-
     const notesClass = classNames(styles.mb2, styles.muted)
     const minimalView = !editCollaborators && (showBenefactorsUI || showReview)
     const showCollaboratorsTable = editCollaborators || validCollaborators.length > 0
@@ -139,147 +138,3 @@ export const CreateCollaboration = () => {
 
         )
 }
-
-
-/*
-
-
-    // Add / remove collabs
-    // const addCollaborator = () => {
-    //     if (totalAllocated < 100) {
-    //         setCollaborators([...collaborators, { ...template }])
-    //     }
-    // }
-
-    // const removeCollaborator = (index) => {
-    //     const updatedCollaborators = [...collaborators]
-    //     updatedCollaborators.splice(index, 1)
-    //     setCollaborators(updatedCollaborators)
-    // }
-
-    // Add / remove benefactors
-    // const addBenefactor = () => {
-    //     setBenefactors([
-    //         ...collaborators,
-    //         { ...collaboratorTemplate }
-    //     ])
-    // }
-
-    // const removeBenefactor = (index) => {
-    //     const updatedBenefactors = [...benefactors]
-    //     updatedBenefactors.splice(index, 1)
-    //     setBenefactors(updatedBenefactors)
-    // }
-
-    // const _extractAddress = (input) => {
-    //     const tzPattern = /^.*(tz[\w\d]{34}).*$/i
-    //     let matches = tzPattern.exec(input.trim())
-
-    //     // Check for contract patterns
-    //     if (!matches) {
-    //         const ktPattern = /^.*(kt[\w\d]{34}).*$/i
-    //         matches = ktPattern.exec(input.trim())
-    //     }
-
-    //     if (!matches) {
-    //         return false
-    //     }
-
-    //     return matches[1];
-    // }
-
-    // const calculateSplits = () => {
-    //     if (!collaborators.length) {
-    //         return false;
-    //     }
-
-    //     let updatedCollaborators;
-
-    //     if (autoSplit) {
-    //         const royaltiesPerCollaborator = availablePercentage / validCollaborators.length
-
-    //         // Even split
-    //         updatedCollaborators = [...collaborators].map(collaborator => ({
-    //             address: collaborator.address,
-    //             percentage: royaltiesPerCollaborator,
-    //             share: royaltiesPerCollaborator,
-    //         }))
-
-    //     } else {
-
-    //         // Map the percentages to the available amounts
-    //         updatedCollaborators = collaborators.map(collaborator => ({
-    //             ...collaborator,
-    //             share: collaborator.shares / 100 * availablePercentage,
-    //         }))
-    //     }
-
-    //     setCollaborators(updatedCollaborators)
-    // }
-
-    // const parseCollabAddresses = (input) => {
-    //     const updatedAddresses = [...addresses]
-    //     const lines = input.replace(/\r/g, '').split(/\n/)
-    //     const newAddresses = lines.map(l => extractAddress(l)).filter(a => a)
-
-    //     // Add new addresses
-    //     const combinedAddresses = updatedAddresses.concat(newAddresses)
-
-    //     // If we have addresses, create the collab
-    //     setAddresses(combinedAddresses)
-    // }
-
-    // When the addresses update in autosplit mode
-    // useEffect(() => {
-    //     const royaltiesPerCollaborator = 100 / addresses.length
-
-    //     const collaborators = addresses.map(address => ({
-    //         address,
-    //         percentage: royaltiesPerCollaborator,
-    //         share: royaltiesPerCollaborator,
-    //     }))
-
-    //     setCollaborators(collaborators)
-    //     setMultiCollabInput('')
-    // }, [addresses])
-
-    // useEffect(() => {
-    //     if (multiCollabInput.length) {
-    //         parseCollabAddresses(multiCollabInput)
-    //     }
-    // }, [multiCollabInput])
-
-    // useEffect(() => {
-    //     if (collaborators.length === 0) {
-    //         if (!autoSplit) {
-    //             setCollaborators([{ ...collaboratorTemplate }])
-    //         }
-    //     }
-
-    //     if (validCollaborators.length === 0 && collaborators.length === 1) {
-    //         setCollaborators([])
-    //     } else {
-    //         calculateSplits()
-    //     }
-    // }, [autoSplit, availablePercentage])
-
-    // const onUpdate = (index, collabData) => {
-    //     const updatedCollabs = [...collaborators]
-
-    //     updatedCollabs[index] = {
-    //         ...collabData,
-    //         share: collabData.shares / 100 * availablePercentage,
-    //     }
-
-    //     setCollaborators([...updatedCollabs])
-    // }
-
-
-
-    // const [tips, setTips] = useState([])
-    // const [autoSplit, setAutoSplit] = useState(false)
-    // const [multiCollabInput, setMultiCollabInput] = useState('')
-    // const [multiBenefactorInput, setMultiBenefactorInput] = useState('')
-    // const [addresses, setAddresses] = useState([])
-
-    */

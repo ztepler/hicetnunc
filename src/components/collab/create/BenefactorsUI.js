@@ -26,6 +26,10 @@ export const BenefactorsUI = ({ benefactors, setBenefactors, onSelectPercentage,
 
     // Remove benefactor
     const removeBenefactor = (index) => {
+
+        // Select a zero percentage for this one
+        onSelectPercentage(index, 0);
+
         const updatedBenefactors = [...benefactors]
         updatedBenefactors.splice(index, 1)
         setBenefactors(updatedBenefactors)
@@ -68,6 +72,7 @@ export const BenefactorsUI = ({ benefactors, setBenefactors, onSelectPercentage,
         [styles.mb1]: benefactors.length === 0,
         [styles.mb2]: benefactors.length > 0,
     })
+    
     const notesClass = classNames(styles.muted, {
         [styles.mb1]: benefactors.length === 0,
         [styles.mb2]: benefactors.length > 0,
@@ -132,7 +137,7 @@ export const BenefactorsUI = ({ benefactors, setBenefactors, onSelectPercentage,
 
             {validBenefactors.length > 0 && totalParticipants >= 2 && (
                 <AddCollaboratorsButton
-                    threshold={totalParticipants - validBenefactors.length}
+                    threshold={1}
                     collaborators={benefactors}
                     onClick={onComplete}
                 />
@@ -140,7 +145,7 @@ export const BenefactorsUI = ({ benefactors, setBenefactors, onSelectPercentage,
 
             {(validBenefactors.length === 0 || totalParticipants < 2) && (
                 <div className={styles.mt2}>
-                    {totalParticipants > 2 && (
+                    {totalParticipants >= 2 && (
                         <Button onClick={onComplete}>
                             <Purchase>
                                 Skip

@@ -3,15 +3,16 @@ import React, { createContext, Component } from 'react'
 import { withRouter } from 'react-router'
 import {
   BeaconWallet,
-  BeaconWalletNotInitialized,
+  // BeaconWalletNotInitialized,
 } from '@taquito/beacon-wallet'
 import { TezosToolkit, OpKind, MichelsonMap } from '@taquito/taquito'
 import { Parser, Expr } from "@taquito/michel-codec";
 import { Schema } from "@taquito/michelson-encoder";
 import { setItem } from '../utils/storage'
-import { KeyStoreUtils } from 'conseiljs-softsigner'
-import { PermissionScope } from '@airgap/beacon-sdk'
-import { UnitValue } from '@taquito/michelson-encoder'
+// import { KeyStoreUtils } from 'conseiljs-softsigner'
+// import { PermissionScope } from '@airgap/beacon-sdk'
+// import { UnitValue } from '@taquito/michelson-encoder'
+import { packParticipantMap } from '../components/collab/functions';
 
 const { NetworkType } = require('@airgap/beacon-sdk')
 var ls = require('local-storage')
@@ -705,41 +706,61 @@ class HicetnuncContextProviderClass extends Component {
 
         setTimeout(() => {
           const result = {
-            opHash: 'opQ2gLDiqHCqhQTKK5h9vCnL3c3izFeB11SQRuFzUricptKH6pJ',
+            opHash: 'oopUm17Qc4kv7abGUzAZCpuy3c3nHRWuSjRRBEorNwDk18J1Mes', // current one
           }
 
           axios
             .get(`https://api.tzkt.io/v1/operations/originations/${result.opHash}`)
-            .then(({ data }) => {
-              const { originatedContract } = data[0]
+            .then(response => {
 
-              // We can either sign in now, or force a button to do so
-              // this.state.setProxyAddress(originatedContract.address)
+              const { data } = response;
 
-              this.setState({
-                originatedContract,
-              })
+              console.log("response from originations call", data[0]);
 
-              // We have got our contract address
-              this.state.setFeedback({
-                message: 'Collaborative contract created successfully',
-                progress: true,
-                confirm: false,
-              })
+              if (data[0]) {
+                console.log('There is correct data', data[0])
+
+                // Send the originated contract to the UI via context
+                const { originatedContract } = data[0]
+                this.setState({ originatedContract }) // save hash
+                console.log("Saved state originatedContract", originatedContract);
+
+                // We have got our contract address
+                this.state.setFeedback({
+                  message: 'Collaborative contract created successfully',
+                  progress: true,
+                  confirm: false,
+                })
+
+                ls.set('collab_address', originatedContract.address)
+
+              } else {
+                console.log('missing data')
+
+                // We have got our contract address
+                this.state.setFeedback({
+                  message: 'Sorry, there was an error creating the collaborative contract',
+                  progress: true,
+                  confirm: false,
+                })
+              }
 
               // Hide after a second
               setTimeout(() => {
                 this.state.setFeedback({
                   visible: false,
                 })
-              }, 2000)
+              }, 1000)
             })
+
         }, 2000)
 
       },
 
-      originateProxy: async (administratorAddress, participantData) => {
-      
+      originateProxy: async participantData => {
+
+        console.log("originateProxy", participantData);
+
         // Show progress during creation
         this.state.setFeedback({
           visible: true,
@@ -748,20 +769,11 @@ class HicetnuncContextProviderClass extends Component {
           confirm: false,
         })
 
-        // packing participants data:
-        // (TODO: move to separate func)
-        const participantMap = MichelsonMap.fromLiteral(participantData);
-
-        const parser = new Parser();
-        const michelsonType = parser.parseData(createProxySchema);
-        const schema = new Schema(michelsonType);
-        const data = schema.Encode(participantMap);
+        const packDataParams = packParticipantMap(participantData);
+        console.log("packDataParams", packDataParams);
 
         // Is it okay to make it blocking?:
-        const { packed } = await Tezos.rpc.packData({
-          data,
-          type: michelsonType,
-        });
+        const { packed } = await Tezos.rpc.packData(packDataParams);
 
         // Blockchain ops
         await Tezos.wallet
@@ -773,26 +785,48 @@ class HicetnuncContextProviderClass extends Component {
           )
           .then(result => {
 
+            console.log("Result of originate call", result)
+
             // TODO: this is a bit too nested for my liking
-            
+
             // Keep the operation hash for further queries if required (do we need this?)
             this.setState({ op: result.opHash })
 
-            // Query tzkt.io to get the originated contract address
             axios
               .get(`https://api.tzkt.io/v1/operations/originations/${result.opHash}`)
               .then(response => {
 
-                // Send the originated contract to the UI via context
-                const { originatedContract } = response
-                this.setState({ originatedContract }) // save hash
+                const { data } = response;
 
-                // We have got our contract address
-                this.state.setFeedback({
-                  message: 'Collaborative contract created successfully',
-                  progress: true,
-                  confirm: false,
-                })
+                console.log("response from originations call", data[0]);
+
+                if (data[0]) {
+                  console.log('There is correct data', data[0])
+
+                  // Send the originated contract to the UI via context
+                  const { originatedContract } = data[0]
+                  this.setState({ originatedContract }) // save hash
+                  console.log("Saved state originatedContract", originatedContract);
+
+                  // We have got our contract address
+                  this.state.setFeedback({
+                    message: 'Collaborative contract created successfully',
+                    progress: true,
+                    confirm: false,
+                  })
+
+                  ls.set('collab_address', originatedContract.address)
+
+                } else {
+                  console.log('missing data')
+
+                  // We have got our contract address
+                  this.state.setFeedback({
+                    message: 'Sorry, there was an error creating the collaborative contract',
+                    progress: true,
+                    confirm: false,
+                  })
+                }
 
                 // Hide after a second
                 setTimeout(() => {

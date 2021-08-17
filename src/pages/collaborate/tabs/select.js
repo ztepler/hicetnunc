@@ -65,7 +65,7 @@ export const SelectProxyContract = () => {
 
       {proxyAddress && (
         <Padding>
-          <p className={styles.mt3}>You are now signed in with your collaborative address and can mint OBJKTs with it (copy TBC)</p>
+          <p className={styles.mt3}>You are now signed in with your collaborative address and can mint OBJKTs with it.</p>
         </Padding>
       )}
     </Container>
