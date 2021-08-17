@@ -66,6 +66,9 @@ export const SelectProxyContract = () => {
       {proxyAddress && (
         <Padding>
           <p className={styles.mt3}>You are now signed in with your collaborative address and can mint OBJKTs with it.</p>
+          <Button onClick={() => setProxyAddress(null)}>
+            <Curate>Sign out of collaborative contract</Curate>
+          </Button>
         </Padding>
       )}
     </Container>

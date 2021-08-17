@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { CollaboratorRow, collaboratorTemplate } from '../'
-import { extractAddress } from '../functions'
+import { extractAddress, removeDuplicates } from '../functions'
 import styles from '../styles.module.scss'
 
 export const CollaboratorTable = ({ collaborators, setCollaborators, availableShares, minimalView, onEdit }) => {
@@ -29,8 +29,16 @@ export const CollaboratorTable = ({ collaborators, setCollaborators, availableSh
     // Update collaborator data
     const onUpdate = (index, collabData) => {
         const updatedCollabs = [...collaborators]
-        updatedCollabs[index] = collabData
-        setCollaborators([...updatedCollabs])
+
+        if (updatedCollabs.some(collaborator => collaborator.address === collabData.address)) {
+            console.log("Address exists")
+        } else {
+            updatedCollabs[index] = collabData
+        }
+
+        // Remove duplicates
+        
+        setCollaborators(updatedCollabs)
     }
 
     // Handle multiline input - this will set an array of address
@@ -39,7 +47,7 @@ export const CollaboratorTable = ({ collaborators, setCollaborators, availableSh
         if (multilineInput.length) {
             const currentAddresses = collaborators.filter(c => c.address).map(c => c.address)
             const lines = multilineInput.replace(/\r/g, '').split(/\n/)
-            const newAddresses = lines.map(l => extractAddress(l)).filter(a => a)
+            const newAddresses = lines.map(l => extractAddress(l)).filter(a => !!a && currentAddresses.indexOf(a) === -1)
 
             // Combine with existing
             const allAddresses = currentAddresses.concat(newAddresses)

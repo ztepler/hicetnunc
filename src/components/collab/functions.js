@@ -16,6 +16,9 @@ export const packParticipantMap = (participantData) => {
     }
 }
 
+export const validAddress = (input) => {
+    return (['tz', 'KT'].indexOf(input.substr(0, 2)) > -1) && (input.length === 36)
+}
 
 export const extractAddress = (input) => {
     const tzPattern = /^.*(tz[\w\d]{34}).*$/i

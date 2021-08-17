@@ -297,7 +297,9 @@ class HicetnuncContextProviderClass extends Component {
           .catch((error) => console.log(error))
       },
 
-      proxyAddress: null,
+      // Signed in collab address (if applicable)
+      // We will retrieve from local storage
+      proxyAddress: ls.get('collab_address'),
 
       // This will be set after creating a new collab
       // but we don't want to auto-sign in
@@ -309,6 +311,9 @@ class HicetnuncContextProviderClass extends Component {
           proxyAddress: proxyAddress,
           // objkt: proxyAddress || 'KT1Hkg5qeNhfwpKW4fXvq7HGZB9z2EnmCCA9'
         });
+
+        // Store in local storage too for retrieval later
+        ls.set('collab_address', proxyAddress)
       },
 
       // Do we need this? proxyAddress will push to UI via context

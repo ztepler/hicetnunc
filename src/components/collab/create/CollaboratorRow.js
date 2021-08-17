@@ -6,6 +6,7 @@ import inputStyles from '../../../components/input/styles.module.scss'
 import { CloseIcon } from '../'
 import classNames from "classnames"
 import { GetUserMetadata } from "../../../data/api"
+import { validAddress } from "../functions"
 
 export const CollaboratorRow = ({ collaborator, onUpdate, onAdd, onRemove, onPasteMulti, minimalView, onEdit }) => {
 
@@ -16,6 +17,10 @@ export const CollaboratorRow = ({ collaborator, onUpdate, onAdd, onRemove, onPas
     useEffect(() => {
         const { address, shares } = collaborator
 
+        if (!validAddress(address)) {
+            return
+        }
+        
         if (!meta && address) {
             GetUserMetadata(address)
             .then(({ data }) => setMeta(data))

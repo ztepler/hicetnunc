@@ -213,9 +213,9 @@
   vertical-align: middle;
   transition: color #{$theme-duration} ease-out;
 
-  + p {
-    letter-spacing: 0;
-  }
+  // + p {
+  //   letter-spacing: 0;
+  // }
 
   &::placeholder {
     color: var(--text-color);
