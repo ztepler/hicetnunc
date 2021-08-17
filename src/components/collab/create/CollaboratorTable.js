@@ -37,7 +37,6 @@ export const CollaboratorTable = ({ collaborators, setCollaborators, availableSh
         }
 
         // Remove duplicates
-        
         setCollaborators(updatedCollabs)
     }
 

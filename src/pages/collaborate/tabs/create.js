@@ -1,5 +1,5 @@
 import { useState, useEffect, Fragment } from 'react'
-import { groupShareTotal } from '../../../components/collab/functions'
+import { groupShareTotal, validAddress } from '../../../components/collab/functions'
 import { Container, Padding } from '../../../components/layout'
 import { CollaboratorTable, BenefactorsUI } from '../../../components/collab'
 import { AddCollaboratorsButton } from '../../../components/collab/create/AddCollaboratorsButton'
@@ -25,7 +25,7 @@ export const CreateCollaboration = () => {
     const totalShares = groupShareTotal(collaborators) + groupShareTotal(benefactors)
 
     // Check for completed entries - must have a share allocation and address
-    const validCollaborators = collaborators.filter(c => c.shares && c.address)
+    const validCollaborators = collaborators.filter(c => !!c.shares && validAddress(c.address))
 
     useEffect(() => {
         if (benefactors.length === 0) {
@@ -80,7 +80,7 @@ export const CreateCollaboration = () => {
 
     return showReview ? (
         <ReviewStage
-            collaborators={collaborators}
+            collaborators={validCollaborators}
             benefactors={benefactors}
             onEdit={() => setShowReview(false)}
         />
@@ -101,7 +101,7 @@ export const CreateCollaboration = () => {
 
                     {showCollaboratorsTable && (
                         <CollaboratorTable
-                            collaborators={collaborators}
+                            collaborators={editCollaborators ? collaborators : validCollaborators}
                             setCollaborators={setCollaborators}
                             minimalView={minimalView}
                             onEdit={() => setEditCollaborators(true)}
