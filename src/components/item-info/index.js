@@ -5,6 +5,8 @@ import { HicetnuncContext } from '../../context/HicetnuncContext'
 import { walletPreview } from '../../utils/string'
 import styles from './styles.module.scss'
 import { CollabIssuerInfo } from '../collab/show/CollabIssuerInfo'
+import { userHasSignedObjkt } from '../collab/functions'
+import { SigningUI } from '../collab/sign/SigningUI'
 
 const _ = require('lodash')
 
@@ -14,6 +16,7 @@ export const ItemInfo = ({
   owners,
   swaps,
   creator,
+  token_signatures,
   // transfered,
   feed,
   token_holders,
@@ -90,35 +93,48 @@ export const ItemInfo = ({
     }
 
     // the issuer path depends on whether it's a collab address (KT) or individual (tz)
-    const { ISSUER, COLLAB } = PATH
-    const creatorAddress = creator.address
-    const isCollab = creatorAddress.substring(0, 2) === 'KT'
-    const issuerPath = isCollab ? COLLAB : ISSUER
+    // const { ISSUER, COLLAB } = PATH
+    const isCollab = creator.is_split
+    const isSigned = creator.is_signed
+    const verifiedStatus = isCollab && isSigned ? 'VERIFIED' : 'UNVERIFIED'
+
+    // Show the signing UI here
+    const userHasSigned = token_signatures.find(sig => sig.holder_id === acc?.address)
+    // const userHasSigned = userHasSignedObjkt({
+    //   objktId: id,
+    //   address: acc?.address,
+    //   creator
+    // })
 
     return (
       <>
         <div style={{ height: '30px' }}></div>
         <div className={styles.container}>
           <div className={styles.edition}>
-            <div className={styles.inline}>
-              <p className={styles.issuer}>{isCollab ? 'Collaboration:' : 'Issuer:'}&nbsp;</p>
+            <div>
+              <div className={styles.inline}>
+                <p className={styles.issuer}>{isCollab ? 'Collab:' : 'Issuer:'}&nbsp;</p>
+
+                {isCollab && (
+                  <CollabIssuerInfo creator={creator} />
+                )}
+
+                {!isCollab && (
+                  <Button to={`/tz/${creator.address}`}>
+                    {creator.name ? (
+                      <Primary>{encodeURI(creator.name)}</Primary>
+                    ) : (
+                      <Primary>{walletPreview(creator.address)}</Primary>
+                    )}
+                  </Button>
+                )}
+              </div>
+
               {isCollab && (
-                <CollabIssuerInfo address={ creatorAddress } />
-              )}
-              {!isCollab && (
-                <Button
-                  to={
-                    `/tz/${creator.address}`
-                  }
-                >
-                  {creator.name ? (
-                    <Primary>{encodeURI(creator.name)}</Primary>
-                  ) : (
-                    <Primary>{walletPreview(creator.address)}</Primary>
-                  )}
-                </Button>
+                <p><strong>** {verifiedStatus} **</strong></p>
               )}
             </div>
+
             {!feed && (
               <div>
                 <p>
@@ -132,6 +148,7 @@ export const ItemInfo = ({
               </div>
             )}
           </div>
+
           {feed && (
             <div className={styles.objktContainer}>
               <Button to={`${PATH.OBJKT}/${id}`} disabled={isDetailView}>
@@ -141,6 +158,12 @@ export const ItemInfo = ({
           )}
         </div>
 
+        {isDetailView && isCollab && !isSigned && (
+          <div className={styles.container} style={{ paddingTop: 0 }}>
+            <SigningUI id={id} hasSigned={userHasSigned} />
+          </div>
+        )}
+
         {isDetailView && (
           <div className={styles.spread}>
             <p style={{ paddingBottom: '7.5px' }}>OBJKT#{id}</p>
@@ -149,6 +172,7 @@ export const ItemInfo = ({
             </Button>
           </div>
         )}
+
         <div className={styles.spread}>
           <Button onClick={() => curate(id)}>
             <Primary>

@@ -1,5 +1,5 @@
-export const getUserMetaQuery = `query UserMeta($_eq: String = "tz1YJvMiZyXnzvV9pxtAiuCFvaG7XoBZhbUQ") {
-    hic_et_nunc_holder(where: { address: { _eq: $_eq } }) {
+export const getUserMetaQuery = `query UserMeta($address: String = "") {
+    hic_et_nunc_holder(where: { address: { _eq: $address } }) {
         name
         metadata
     }
@@ -24,18 +24,41 @@ export const getCollabObjkts = `query CollabObjkts {
     }
   }`
 
-export async function fetchGraphQL(operationsDoc, operationName, variables) {
-    const result = await fetch(
-        "https://api.hicdex.com/v1/graphql",
-        {
-            method: "POST",
-            body: JSON.stringify({
-                query: operationsDoc,
-                variables: variables,
-                operationName: operationName
-            })
+export const getAvailableCollabAddresses = `query GetCollabContracts($address: String!) {
+  hic_et_nunc_splitcontract(where: {administrator: {_eq: $address}}) {
+    contract {
+      address
+      shares {
+        shareholder(where: {holder_type: {_eq: "core_participant"}}) {
+          holder {
+            name
+          }
         }
-    );
-    return await result.json()
+      }
+    }
+  }
+}`
+
+export async function fetchGraphQL(operationsDoc, operationName, variables) {
+  const result = await fetch(
+    "https://api.hicdex.com/v1/graphql",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        query: operationsDoc,
+        variables: variables,
+        operationName: operationName
+      })
+    }
+  );
+
+  console.log(JSON.stringify({
+    query: operationsDoc,
+    variables: variables,
+    operationName: operationName
+  }))
+
+  return await result.json()
 }
+
 

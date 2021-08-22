@@ -88,6 +88,10 @@ class HicetnuncContextProviderClass extends Component {
       hDAO_curation: 'KT1TybhR7XraG75JFYKSrh7KnxukMBT5dor6',
       hDAO_marketplace: 'KT1QPvv7sWVaT9PcPiC4fN9BgfX8NB2d5WzL',
 
+      // Collab additions
+      proxyFactoryAddress: 'KT1DoyD6kr8yLK8mRBFusyKYJUk2ZxNHKP1N',
+      signingContractAddress: 'KT1BcLnWRziLDNJNRn3phAANKrEBiXhytsMY',
+
       subjktInfo: {},
       setSubjktInfo: (subjkt) => this.setState({ subjktInfo: subjkt }),
 
@@ -440,6 +444,16 @@ class HicetnuncContextProviderClass extends Component {
           })
       },
 
+      sign: async (objkt_id) => {
+        await Tezos.wallet
+          .at(this.state.signingContractAddress)
+          .then(c => c.methods
+            .sign(objkt_id)
+            .send({ amount: 0, storageLimit: 310 })
+          )
+          .then((op) => console.log(op))
+      },
+
       claim_hDAO: async (hDAO_amount, objkt_id) => {
         // console.log('claiming', hDAO_amount, objkt_id)
         await Tezos.wallet
@@ -697,8 +711,6 @@ class HicetnuncContextProviderClass extends Component {
         })
       },
       hDAO_vote: ls.get('hDAO_vote'),
-
-      proxyFactoryAddress: 'KT1DoyD6kr8yLK8mRBFusyKYJUk2ZxNHKP1N',
 
       mockProxy: async () => {
 

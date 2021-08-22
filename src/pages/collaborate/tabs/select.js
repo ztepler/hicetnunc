@@ -2,12 +2,13 @@ import React, { useState, useContext, useEffect } from 'react'
 import { HicetnuncContext } from '../../../context/HicetnuncContext'
 import { Container, Padding } from '../../../components/layout'
 import { Input } from '../../../components/input'
-import { Button, Curate } from '../../../components/button'
+import { Button, Curate, Purchase } from '../../../components/button'
 import styles from '../../../components/collab/styles.module.scss'
+import { ProxyAddressSelector } from '../../../components/collab/select/ProxyAddressSelector'
 
 export const SelectProxyContract = () => {
 
-  const { proxyAddress, setProxyAddress, originatedContract } = useContext(HicetnuncContext)
+  const { proxyAddress, setProxyAddress, originatedContract, acc } = useContext(HicetnuncContext)
 
   const [localProxyContractAddress, setLocalProxyContractAddress] = useState(proxyAddress)
   const [invalidAddress, setInvalidAddress] = useState(false)
@@ -39,7 +40,7 @@ export const SelectProxyContract = () => {
 
   return (
     <Container>
-      <Padding>
+      {/* <Padding>
         <Input
           type="text"
           onChange={e => setLocalProxyContractAddress(e.target.value)}
@@ -47,30 +48,32 @@ export const SelectProxyContract = () => {
           label="collaborative contract address"
           value={localProxyContractAddress}
         />
-      </Padding>
+      </Padding> */}
 
-      {invalidAddress && (
+      {/* {invalidAddress && (
         <Padding>
           <p>Sorry - this is not a valid collaborative contract address</p>
         </Padding>
-      )}
+      )} */}
 
-      {!proxyAddress && (
+      {/* {!proxyAddress && (
         <Padding>
           <Button onClick={_validateAddress} fit>
             <Curate>Sign in with this collaborative contract</Curate>
           </Button>
         </Padding>
-      )}
+      )} */}
+      <ProxyAddressSelector />
 
       {proxyAddress && (
         <Padding>
-          <p className={{...styles.mt3, ...styles.mb3}}>You are now signed in with your collaborative address and can mint OBJKTs with it.</p>
+          <p className={styles.mb1}>You are now signed in with your collaborative address and can mint OBJKTs with it.</p>
           <Button onClick={() => setProxyAddress(null)}>
-            <Curate>Sign out of collaborative contract</Curate>
+            <Purchase>Sign out of collaborative contract</Purchase>
           </Button>
         </Padding>
       )}
+
     </Container>
   )
 }

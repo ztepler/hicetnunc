@@ -14,7 +14,7 @@ import { Info, Collectors, Swap, Burn, History } from './tabs'
 import styles from './styles.module.scss'
 import './style.css'
 
-const axios = require('axios')
+// const axios = require('axios')
 
 const TABS = [
   { title: 'info', component: Info }, // public tab
@@ -33,9 +33,23 @@ timestamp
 display_uri
 description
 artifact_uri
+is_signed
 creator {
   address
   name
+  is_split
+  shares {
+    shareholder {
+      holder_type
+      holder_id
+      holder {
+        name
+      }
+    }
+  }
+}
+token_signatures {
+  holder_id
 }
 thumbnail_uri
 title
@@ -97,7 +111,7 @@ async function fetchObjkt(id) {
     console.error(errors)
   }
   const result = data.hic_et_nunc_token_by_pk
-  console.log(result)
+  console.log("data.hic_et_nunc_token_by_pk", result)
   return result
 
 }
