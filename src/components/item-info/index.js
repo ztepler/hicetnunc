@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { PATH } from '../../constants'
-import { Button, Primary, Purchase } from '../button'
+import { Button, Primary, Purchase, Secondary } from '../button'
 import { HicetnuncContext } from '../../context/HicetnuncContext'
 import { walletPreview } from '../../utils/string'
 import styles from './styles.module.scss'
@@ -8,6 +8,7 @@ import { CollabIssuerInfo } from '../collab/show/CollabIssuerInfo'
 import { userHasSignedObjkt } from '../collab/functions'
 import collabStyles from '../collab/styles.module.scss'
 import { SigningUI } from '../collab/sign/SigningUI'
+import { SigningSummary } from '../collab/show/SIgningSummary'
 
 const _ = require('lodash')
 
@@ -98,7 +99,8 @@ export const ItemInfo = ({
 
     // Check collab status
     const isCollab = creator.is_split
-    const verifiedStatus = isCollab && is_signed ? '✓ VERIFIED' : '⚠️ UNVERIFIED'
+    const verifiedSymbol = isCollab && is_signed ? '✓ ' : '⚠️'
+    const verifiedStatus = isCollab && is_signed ? 'VERIFIED' : 'UNVERIFIED'
     const isCoreParticipant = isCollab ? creator.shares[0].shareholder.find(h => h.holder_id === acc?.address) : false
 
     // Show the signing UI if required
@@ -165,6 +167,7 @@ export const ItemInfo = ({
               <p style={{ paddingBottom: '7.5px' }}>OBJKT#{id}</p>
               {isCollab && (
                 <div className={collabStyles.relative}>
+                  <span>{verifiedSymbol}</span>
                   <Button onClick={() => setShowSignStatus(!showSignStatus)}>
                     <Primary>
                       <strong>{verifiedStatus}</strong>
@@ -172,7 +175,14 @@ export const ItemInfo = ({
                   </Button>
                   {showSignStatus && (
                     <div className={collabStyles.collabInfo}>
-                      Sign status here
+                      <div className={collabStyles.flexBetween}>
+                        <SigningSummary collabs={ creator.shares[0] } signatures={ token_signatures } />
+                        <Button onClick={() => setShowSignStatus(false)}>
+                          <Secondary>
+                            close
+                          </Secondary>
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </div>

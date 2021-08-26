@@ -6,16 +6,22 @@ import { Input } from '../../../components/input'
 import { Loading } from '../../../components/loading'
 
 export const Burn = (props) => {
-  const { burn, address } = useContext(HicetnuncContext)
+  console.log("BURN", props)
+  
+  const { token_holders, id } = props
+  const { burn, acc, proxyAddress } = useContext(HicetnuncContext)
   const [message, setMessage] = useState() // eslint-disable-line
   const [amount, setAmount] = useState('')
   const [progress, setProgress] = useState() // eslint-disable-line
 
   let totalOwned = 0
 
-  const found = props.token_holders.find(
-    (e) => e.holder_id === address?.address
+  const proxyAdminAddress = props.creator.is_split ? props.creator.shares[0].administrator : null
+
+  const found = token_holders.find(
+    (e) => e.holder_id === acc?.address || (e.holder_id === proxyAddress && acc?.address === proxyAdminAddress)
   )
+
   if (found) {
     totalOwned = found.quantity
   }
@@ -39,7 +45,7 @@ export const Burn = (props) => {
     if (r) {
       setProgress(true)
       setMessage('burning OBJKT')
-      burn(props.id, amount)
+      burn(id, amount)
     }
   }
 
@@ -48,8 +54,8 @@ export const Burn = (props) => {
       <Container>
         <Padding>
           <p>
-            You own {totalOwned} editions of OBJKT#{props.id}. How many would
-            you like to burn?
+            {totalOwned === 0 && <span>You don’t own any editions of OBJKT#{id} so you have nothing to burn</span>}
+            {totalOwned > 0 && <span>You own {totalOwned} edition{totalOwned === 1 ? '' : 's'} of OBJKT#{id} - how many would you like to burn?</span>}
           </p>
         </Padding>
       </Container>
