@@ -304,20 +304,23 @@ class HicetnuncContextProviderClass extends Component {
       // Signed in collab address (if applicable)
       // We will retrieve from local storage
       proxyAddress: ls.get('collab_address'),
+      proxyName: ls.get('collab_name'),
 
       // This will be set after creating a new collab
       // but we don't want to auto-sign in
       originatedContract: null,
 
-      setProxyAddress: (proxyAddress) => {
+      setProxyAddress: (proxyAddress, proxyName) => {
         // setting proxy updates objkt contract as well:
         this.setState({
           proxyAddress: proxyAddress,
+          proxyName: proxyName,
           // objkt: proxyAddress || 'KT1Hkg5qeNhfwpKW4fXvq7HGZB9z2EnmCCA9'
         });
 
         // Store in local storage too for retrieval later
         ls.set('collab_address', proxyAddress)
+        ls.set('collab_name', proxyName)
       },
 
       // Do we need this? proxyAddress will push to UI via context
@@ -534,8 +537,10 @@ class HicetnuncContextProviderClass extends Component {
       },
 
       registry: async (alias, metadata) => {
-        console.log(metadata)
         const subjktAddressOrProxy = this.state.proxyAddress || this.state.subjkt
+        
+        console.log("Registry ->", metadata, subjktAddressOrProxy)
+        
         return await Tezos.wallet.at(subjktAddressOrProxy).then((c) =>
           c.methods
             .registry(
@@ -629,8 +634,15 @@ class HicetnuncContextProviderClass extends Component {
         // console.log('disconnect wallet')
         // This will clear the active account and the next "syncTaquito" will trigger a new sync
         await wallet.client.clearActiveAccount()
+
+        // Also clear the localstorage of any signed in collab
+        ls.remove('collab_address');
+        ls.remove('collab_name');
+
         this.setState({
           address: undefined,
+          proxyAddress: undefined,
+          proxyName: undefined,
           acc: undefined,
         })
       },

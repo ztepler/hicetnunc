@@ -1,61 +1,99 @@
-import axios from 'axios'
 import { useParams } from 'react-router'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import { PATH } from '../../../constants'
 import { Loading } from '../../loading'
 import { renderMediaType } from '../../media-types'
-import { CollabHeader } from './CollabHeader'
 import { Page, Container, Padding } from '../../layout'
 import { ResponsiveMasonry } from '../../responsive-masonry'
-import { Button } from '../../button'
+import { Button, Primary } from '../../button'
 import styles from '../../../pages/display/styles.module.scss'
+import { HicetnuncContext } from '../../../context/HicetnuncContext'
+import { walletPreview } from '../../../utils/string'
+import { Identicon } from '../../identicons'
+import { fetchGraphQL, getCollabCreations } from '../../../data/hicdex'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import collabStyles from '../styles.module.scss'
+import classNames from 'classnames'
+import { CollabParticipantInfo } from '../manage/CollabParticipantInfo'
+import { CollaboratorType } from '../constants'
+import { ParticipantList } from '../manage/ParticipantList'
+
+console.log(collabStyles)
 
 export const CollabDisplay = () => {
 
-    // The collaborator addresses in the contract
-    const [collaborators, setCollaborators] = useState([])
+    // Local state
     const [creations, setCreations] = useState([])
+    const [contractInfo, setContractInfo] = useState()
+    const [showBenefactors, setShowBenefactors] = useState(false)
+    // const [collaborators, setCollaborators] = useState([])
+    // const [displayName, setDisplayName] = useState()
+    // const [address, setAddress] = useState()
+
+    const [items, setItems] = useState([])
+    const [offset, setOffset] = useState(0)
     const [loading, setLoading] = useState(true)
 
-    // Core storage data from the KT smart contract
-    const [collabData, setCollabData] = useState(null)
+    // Probably OK as a constant for now
+    const chunkSize = 20
 
     // The route passes the contract address in as parameter "id"
     const { id } = useParams()
 
     useEffect(() => {
-        if (id) {
-            // Get the collaborators in this contract
-            axios.get(`https://api.tzkt.io/v1/contracts/${id}/storage`)
-                .then(({ data }) => setCollabData(data))
-        }
+        fetchGraphQL(getCollabCreations, 'GetCollabCreations', {
+            address: id,
+        }).then(({ data, errors }) => {
+            if (data) {
+                setCreations(data.hic_et_nunc_token)
+                setContractInfo(data.hic_et_nunc_splitcontract[0])
+                // const { shareholder, contract } = data.hic_et_nunc_splitcontract[0]
+                // const { name, address } = contract
+                // setCollaborators(shareholder)
+                // setAddress(address)
+                // setDisplayName(name || address)
+            }
+
+            setLoading(false)
+        })
     }, [id])
 
     useEffect(() => {
-        if (collabData) {
-
-            console.log(collabData)
-
-            const participants = [];
-
-            for (let address in collabData.shares) {
-                participants.push({
-                    address,
-                    share: Number(collabData.shares[address]),
-                    role: undefined, // placeholder - we need this
-                })
-            }
-
-            // Set both now
-            setCollaborators(participants)
+        if (items.length === 0 && creations.length > 0) {
+            setItems(creations.slice(0, chunkSize))
         }
-    }, [collabData])
+    }, [creations])
 
-    const sortByTokenId = (a, b) => b.token_id - a.token_id
+    useEffect(() => {
+        if (!loading) {
+            setItems(creations.slice(0, offset))
+        }
+    }, [offset])
+
+    const headerClass = classNames(
+        styles.profile,
+        collabStyles.mb4,
+        collabStyles.pb2,
+        collabStyles.borderBottom,
+    )
+
+    const displayName = contractInfo ? (contractInfo.contract.name || contractInfo.contract.address) : ''
+    const address = contractInfo?.contract.address
+    const description = contractInfo?.contract.description
+    const descriptionClass = classNames(collabStyles.pt1, collabStyles.muted)
+    const logo = null // where does this come from?
+
+    // Core participants
+    const coreParticipants = contractInfo?.shareholder
+        .filter(({ holder_type }) => holder_type === CollaboratorType.CORE_PARTICIPANT);
+
+    // Benefactors
+    const benefactors = contractInfo?.shareholder
+        .filter(({ holder_type }) => holder_type === CollaboratorType.BENEFACTOR);
 
     return (
-        <Page title="Collaboration">
-            <CollabHeader collaborators={collaborators} />
+        <Page title={`Collab: ${displayName}`}>
+            {/* <CollabHeader collaborators={collaborators} /> */}
 
             {loading && (
                 <Container>
@@ -65,25 +103,66 @@ export const CollabDisplay = () => {
                 </Container>
             )}
 
-            {creations.length > 0 && (
-                <Container xlarge>
-                    <ResponsiveMasonry>
-                        {creations.map(nft => {
-                            const { mimeType, uri } = nft.token_info.formats[0]
+            {contractInfo && (
+                <Container>
+                    <Padding>
+                        <div className={headerClass}>
+                            <Identicon address={address} logo={logo} />
 
-                            return (
-                                <Button key={nft.token_id} to={`${PATH.OBJKT}/${nft.token_id}`}>
-                                    <div className={styles.container}>
-                                        {renderMediaType({
-                                            mimeType,
-                                            uri: uri.split('//')[1],
-                                            metadata: nft,
-                                        })}
-                                    </div>
-                                </Button>
-                            )
-                        })}
-                    </ResponsiveMasonry>
+                            <div>
+                                <div className={styles.info}>
+                                    <h2><strong>{displayName}</strong></h2>
+                                </div>
+
+                                <div className={styles.info}>
+                                    {coreParticipants.length > 0 && (
+                                        <ParticipantList title={false} participants={coreParticipants} />)
+                                    }
+
+                                    {showBenefactors && benefactors.length > 0 && (
+                                        <ParticipantList title="benefactors" participants={benefactors} />
+                                    )}
+                                </div>
+
+                                <div className={styles.info}>
+                                    {description && <p className={descriptionClass}>{description}</p>}
+                                    <Button href={`https://tzkt.io/${address}`}>
+                                        <Primary>{walletPreview(address)}</Primary>
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </Padding>
+                </Container>
+            )}
+
+
+            {!loading && (
+                <Container xlarge>
+                    <InfiniteScroll
+                        dataLength={items.length}
+                        next={() => setOffset(offset + chunkSize)}
+                        hasMore={items.length < creations.length}
+                        loader={undefined}
+                        endMessage={undefined}
+                    >
+                        <ResponsiveMasonry>
+                            {items.map(({ id, mime, artifact_uri, display_uri }) => {
+                                return (
+                                    <Button key={id} to={`${PATH.OBJKT}/${id}`}>
+                                        <div className={styles.container}>
+                                            {renderMediaType({
+                                                mimeType: mime,
+                                                artifactUri: artifact_uri,
+                                                displayUri: display_uri,
+                                                displayView: true
+                                            })}
+                                        </div>
+                                    </Button>
+                                )
+                            })}
+                        </ResponsiveMasonry>
+                    </InfiniteScroll>
                 </Container>
             )}
         </Page>

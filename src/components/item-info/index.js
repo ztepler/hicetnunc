@@ -16,6 +16,7 @@ export const ItemInfo = ({
   owners,
   swaps,
   creator,
+  is_signed,
   token_signatures,
   // transfered,
   feed,
@@ -94,9 +95,11 @@ export const ItemInfo = ({
 
     // the issuer path depends on whether it's a collab address (KT) or individual (tz)
     // const { ISSUER, COLLAB } = PATH
+
     const isCollab = creator.is_split
-    const isSigned = creator.is_signed
-    const verifiedStatus = isCollab && isSigned ? 'VERIFIED' : 'UNVERIFIED'
+    // const isSigned = creator.is_signed
+    const verifiedStatus = isCollab && is_signed ? '✓ VERIFIED' : '⚠️ UNVERIFIED'
+    const isCoreParticipant = isCollab ? creator.shares[0].shareholder.find(h => h.holder_id === acc?.address) : false
 
     // Show the signing UI here
     const userHasSigned = token_signatures.find(sig => sig.holder_id === acc?.address)
@@ -129,10 +132,6 @@ export const ItemInfo = ({
                   </Button>
                 )}
               </div>
-
-              {isCollab && (
-                <p><strong>** {verifiedStatus} **</strong></p>
-              )}
             </div>
 
             {!feed && (
@@ -158,15 +157,21 @@ export const ItemInfo = ({
           )}
         </div>
 
-        {isDetailView && isCollab && !isSigned && (
+        {/* SHOW SIGNING UI IF COLLABORATOR */}
+        {isDetailView && isCollab && isCoreParticipant && !userHasSigned && (
           <div className={styles.container} style={{ paddingTop: 0 }}>
-            <SigningUI id={id} hasSigned={userHasSigned} />
+            <SigningUI id={id} hasSigned={false} />
           </div>
         )}
 
         {isDetailView && (
           <div className={styles.spread}>
-            <p style={{ paddingBottom: '7.5px' }}>OBJKT#{id}</p>
+            <div>
+              <p style={{ paddingBottom: '7.5px' }}>OBJKT#{id}</p>
+              {isCollab && (
+                <p><strong>{verifiedStatus}</strong></p>
+              )}
+            </div>
             <Button onClick={() => handleCollect()}>
               <Purchase>{message}</Purchase>
             </Button>

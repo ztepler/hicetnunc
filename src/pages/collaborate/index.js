@@ -5,10 +5,11 @@ import { CollabDisplay } from '../../components/collab/show/CollabDisplay'
 import { SelectProxyContract, CreateCollaboration } from './tabs'
 import { Menu } from '../../components/menu'
 import { HicetnuncContext } from '../../context/HicetnuncContext'
+import { CollabContractsOverview } from './tabs/overview'
 
 const TABS = [
-    { title: 'create collaboration', component: CreateCollaboration },
-    { title: 'use collaboration', component: SelectProxyContract },
+    { title: 'create', component: CreateCollaboration },
+    { title: 'manage', component: CollabContractsOverview },
 ]
 
 const Collaborate = () => {
@@ -24,11 +25,11 @@ const Collaborate = () => {
         }
     }, [proxyAddress, originatedContract])
 
-    // TODO: button to free from proxy contract? (that just makes field empty)
-    // TODO: create new smart contract form with separate page?
+    // TODO: button to free from proxy contract? (that just makes field empty) // Done (SJ)
+    // TODO: create new smart contract form with separate page? // Done (SJ)
     // TODO: add/remove tokens to contract?
-    // TODO: validate proxy address?
-    // TODO: any way to find all contracts that controlled by user pk?
+    // TODO: validate proxy address? // Done (SJ)
+    // TODO: any way to find all contracts that controlled by user pk? // Done (SJ)
 
     return (
         <Page title="proxy">

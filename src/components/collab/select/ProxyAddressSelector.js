@@ -8,23 +8,27 @@ import classNames from 'classnames'
 export const ProxyAddressSelector = () => {
 
     const [availableProxyAddresses, setAvailableProxyAddresses] = useState([])
-    const { proxyAddress, setProxyAddress, originatedContract, acc } = useContext(HicetnuncContext)
+    const { proxyAddress, setProxyAddress, acc } = useContext(HicetnuncContext)
 
     useEffect(() => {
         // On boot, see what addresses the synced address can manage 
         fetchGraphQL(getAvailableCollabAddresses, 'GetCollabContracts', {
             address: acc?.address,
         }).then(({ data, errors }) => {
-            if (data) {
+            if (data && !errors) {
                 setAvailableProxyAddresses(data.hic_et_nunc_splitcontract || [])
             }
         })
+
     }, [])
 
+    useEffect(() => {
+        console.log(`Proxy address changed to ${proxyAddress} - fetch objkts`);
+    }, [proxyAddress])
 
     return availableProxyAddresses.length > 0 ? (
         <div className={styles.mt3}>
-            <p className={styles.mb1}>Here are the contracts you can use</p>
+            <p className={styles.mb1}>Here are the contracts you can use:</p>
             <ul>
                 {availableProxyAddresses.map(proxy => {
                     const { address, shares } = proxy.contract
@@ -40,6 +44,7 @@ export const ProxyAddressSelector = () => {
                                 <span key={holder.name}>{holder.name}{index < coreParticipants.length - 1 && ", "}</span>
                             ))}</p>
                         </div>
+
                         {address !== proxyAddress && (
                             <Button onClick={() => setProxyAddress(address)}>
                                 <Purchase>Use this contract</Purchase>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { CollaboratorRow, collaboratorTemplate } from '../'
-import { extractAddress, removeDuplicates } from '../functions'
+import { extractAddress } from '../functions'
 import styles from '../styles.module.scss'
 
 export const CollaboratorTable = ({ collaborators, setCollaborators, availableShares, minimalView, onEdit }) => {

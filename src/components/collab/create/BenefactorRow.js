@@ -29,7 +29,7 @@ export const BenefactorRow = ({
 
         setAddress(address)
         setShares(shares)
-    }, [benefactor])
+    }, [benefactor, meta])
 
     const _update = (field, value) => {
 

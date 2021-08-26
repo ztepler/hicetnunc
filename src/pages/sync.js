@@ -4,6 +4,7 @@ import { HicetnuncContext } from '../context/HicetnuncContext'
 import { Page, Container, Padding } from '../components/layout'
 import { LoadingContainer } from '../components/loading'
 import { Button, Primary } from '../components/button'
+import { PATH } from '../constants'
 
 export default class Sync extends Component {
   constructor(props) {
@@ -26,8 +27,11 @@ export default class Sync extends Component {
   }
 
   render() {
+    const { proxyAddress, acc } = this.context
+    const path = PATH[proxyAddress ? 'COLLAB' : 'ISSUER']
+
     return this.context.acc !== undefined ? (
-      <Redirect to={`/tz/${this.context.getProxy() || this.context.acc.address}`} />
+      <Redirect to={`${path}/${proxyAddress || acc.address}`} />
     ) : (
       <Page title="">
         <Container>

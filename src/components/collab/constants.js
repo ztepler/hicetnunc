@@ -2,6 +2,7 @@ export const CollaboratorType = {
   ADMIN: 'admin',
   CREATOR: 'creator',
   BENEFACTOR: 'benefactor',
+  CORE_PARTICIPANT: 'core_participant',
 }
 
 export const ossProjects = [

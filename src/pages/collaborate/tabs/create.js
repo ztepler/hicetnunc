@@ -1,5 +1,6 @@
-import { useState, useEffect, Fragment } from 'react'
+import { useState, useEffect, Fragment, useContext } from 'react'
 import { groupShareTotal, validAddress } from '../../../components/collab/functions'
+import { HicetnuncContext } from '../../../context/HicetnuncContext'
 import { Container, Padding } from '../../../components/layout'
 import { CollaboratorTable, BenefactorsUI } from '../../../components/collab'
 import { AddCollaboratorsButton } from '../../../components/collab/create/AddCollaboratorsButton'
@@ -9,6 +10,8 @@ import classNames from 'classnames'
 // import { mockData } from '../../../components/collab/constants'
 
 export const CreateCollaboration = () => {
+
+    const { acc } = useContext(HicetnuncContext)
 
     // Core collaborators and benefactors
     const [editCollaborators, setEditCollaborators] = useState(true)
@@ -77,6 +80,15 @@ export const CreateCollaboration = () => {
     const notesClass = classNames(styles.mb2, styles.muted)
     const minimalView = !editCollaborators && (showBenefactorsUI || showReview)
     const showCollaboratorsTable = editCollaborators || validCollaborators.length > 0
+
+
+    if (!acc) {
+        return (
+            <Container>
+                <Padding>Please sync your wallet to create a collaboration</Padding>
+            </Container>
+        )
+    }
 
     return showReview ? (
         <ReviewStage

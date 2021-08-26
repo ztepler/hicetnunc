@@ -36,7 +36,7 @@ export const Header = () => {
   if (context.acc?.address) {
     // is menu closed?
     if (context.collapsed) {
-      const proxyAddress = context.proxyAddress ? ' (' + context.proxyAddress + ')' : ''
+      const proxyAddress = context.proxyAddress ? ` (${context.proxyName || walletPreview(context.proxyAddress)})` : ''
       button = walletPreview(context.acc.address) + proxyAddress
     } else {
       // menu is open
@@ -94,8 +94,16 @@ export const Header = () => {
           </Button>
 
           <div className={styles.right}>
+            {!context.collapsed && context.proxyAddress && (
+              <div className={styles.mr}>
+                <Button onClick={() => context.setProxyAddress(null)} secondary>
+                  <Primary>exit collab</Primary>
+                </Button>
+              </div>
+            )}
+
             <Button onClick={handleSyncUnsync} secondary>
-              <Primary>{button}</Primary>
+              <Primary>{button}</Primary> {/* Main address display here */}
             </Button>
 
             <Button onClick={context.toogleNavbar} secondary>
@@ -147,7 +155,7 @@ export const Header = () => {
                         <Primary>manage assets</Primary>
                       </Button>
                     </li>
-                    { context.acc?.address ?
+                    {context.acc?.address ?
                       <li>
                         <Button onClick={() => handleRoute('/config')}>
                           <Primary>settings</Primary>

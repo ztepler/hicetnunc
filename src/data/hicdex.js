@@ -5,25 +5,6 @@ export const getUserMetaQuery = `query UserMeta($address: String = "") {
     }
 }`
 
-export const getCollabObjkts = `query CollabObjkts {
-    hic_et_nunc_token(where: {creator: {is_split: {_eq: true}}}) {
-      title
-      creator {
-        address
-        shares {
-          administrator
-          total_shares
-          shareholder {
-            holder {
-              name
-              address
-            }
-          }
-        }
-      }
-    }
-  }`
-
 export const getAvailableCollabAddresses = `query GetCollabContracts($address: String!) {
   hic_et_nunc_splitcontract(where: {administrator: {_eq: $address}}) {
     contract {
@@ -34,6 +15,61 @@ export const getAvailableCollabAddresses = `query GetCollabContracts($address: S
             name
           }
         }
+      }
+    }
+  }
+}`
+
+export const getCollabCreations = `query GetCollabCreations($address: String!) {
+  hic_et_nunc_token(where: {creator: {is_split: {_eq: true}, address: {_eq: $address}}, supply: {_gt: 0}}, order_by: {id: desc}) {
+    id
+    artifact_uri
+    display_uri
+    thumbnail_uri
+    timestamp
+    mime
+    title
+    description
+    supply
+    token_tags {
+      tag {
+        tag
+      }
+    }
+  }
+
+  hic_et_nunc_splitcontract(where: {contract_id: {_eq: $address}}) {
+    administrator
+    shareholder {
+      holder {
+        address
+        name
+      }
+      holder_type
+    }
+    contract {
+      name
+      description
+      address
+    }
+  }
+}`
+
+export const getCollabsForAddress = `query GetCollabs($address: String!) {
+  hic_et_nunc_shareholder(where: {holder_id: {_eq: $address}, holder_type: {_eq: "core_participant"}}) {
+    split_contract {
+      contract {
+        address
+        name
+      }
+      administrator
+      shareholder {
+        shares
+        holder {
+          name
+          address
+        }
+        holder_type
       }
     }
   }

@@ -39,6 +39,7 @@ creator {
   name
   is_split
   shares {
+    administrator
     shareholder {
       holder_type
       holder_id
@@ -138,7 +139,7 @@ export const ObjktDisplay = () => {
   const [error, setError] = useState(false)
 
   const address = context.acc?.address
-  const proxy = context.getProxy()
+  const proxy = context.proxyAddress
 
   useEffect(async () => {
     let objkt = await fetchObjkt(id)
@@ -258,10 +259,12 @@ export const ObjktDisplay = () => {
                           (e) => e.holder_id
                         )
 
+                        const isCollabAdmin = nft.creator.is_split ? nft.creator.shares[0].administrator === address : false
+
                         if (
                           holders_arr.includes(address) === false &&
                           nft.creator.address !== address &&
-                          nft.creator.address !== proxy
+                          nft.creator.address !== proxy && !isCollabAdmin
                         ) {
                           // user is not the creator now owns a copy of the object. hide
 

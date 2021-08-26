@@ -21,6 +21,8 @@ const App = () => {
     return <Preloading />
   }
 
+  console.log(routes);
+
   return (
     <HicetnuncContextProvider>
       <Header />
