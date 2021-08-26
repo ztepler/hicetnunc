@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { PATH } from '../../constants'
 import { Button, Primary, Purchase } from '../button'
 import { HicetnuncContext } from '../../context/HicetnuncContext'
@@ -6,6 +6,7 @@ import { walletPreview } from '../../utils/string'
 import styles from './styles.module.scss'
 import { CollabIssuerInfo } from '../collab/show/CollabIssuerInfo'
 import { userHasSignedObjkt } from '../collab/functions'
+import collabStyles from '../collab/styles.module.scss'
 import { SigningUI } from '../collab/sign/SigningUI'
 
 const _ = require('lodash')
@@ -30,6 +31,8 @@ export const ItemInfo = ({
     useContext(HicetnuncContext)
   const reducer = (accumulator, currentValue) =>
     parseInt(accumulator) + parseInt(currentValue)
+
+  const [showSignStatus, setShowSignStatus] = useState(false)
 
   if (isDetailView) {
     // subtract burned pieces from total
@@ -93,21 +96,13 @@ export const ItemInfo = ({
       )
     }
 
-    // the issuer path depends on whether it's a collab address (KT) or individual (tz)
-    // const { ISSUER, COLLAB } = PATH
-
+    // Check collab status
     const isCollab = creator.is_split
-    // const isSigned = creator.is_signed
     const verifiedStatus = isCollab && is_signed ? '✓ VERIFIED' : '⚠️ UNVERIFIED'
     const isCoreParticipant = isCollab ? creator.shares[0].shareholder.find(h => h.holder_id === acc?.address) : false
 
-    // Show the signing UI here
+    // Show the signing UI if required
     const userHasSigned = token_signatures.find(sig => sig.holder_id === acc?.address)
-    // const userHasSigned = userHasSignedObjkt({
-    //   objktId: id,
-    //   address: acc?.address,
-    //   creator
-    // })
 
     return (
       <>
@@ -169,7 +164,18 @@ export const ItemInfo = ({
             <div>
               <p style={{ paddingBottom: '7.5px' }}>OBJKT#{id}</p>
               {isCollab && (
-                <p><strong>{verifiedStatus}</strong></p>
+                <div className={collabStyles.relative}>
+                  <Button onClick={() => setShowSignStatus(!showSignStatus)}>
+                    <Primary>
+                      <strong>{verifiedStatus}</strong>
+                    </Primary>
+                  </Button>
+                  {showSignStatus && (
+                    <div className={collabStyles.collabInfo}>
+                      Sign status here
+                    </div>
+                  )}
+                </div>
               )}
             </div>
             <Button onClick={() => handleCollect()}>

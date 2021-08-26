@@ -268,10 +268,20 @@
   position: relative;
 }
 
+.absolute {
+  position: absolute;
+}
+
 .collabInfo {
   position: absolute;
-  top: 100%;
+  z-index: 100;
+  padding: 12px;
   left: 0;
+  top: 30px;
+  left: 0;
+  width: 300px;
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid var(--border-color);
 }
 
 .descriptive {

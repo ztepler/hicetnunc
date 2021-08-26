@@ -259,12 +259,12 @@ export const ObjktDisplay = () => {
                           (e) => e.holder_id
                         )
 
-                        const isCollabAdmin = nft.creator.is_split ? nft.creator.shares[0].administrator === address : false
+                        // const isCollabAdmin = nft.creator.is_split ? nft.creator.shares[0].administrator === address : false
 
                         if (
                           holders_arr.includes(address) === false &&
                           nft.creator.address !== address &&
-                          nft.creator.address !== proxy && !isCollabAdmin
+                          nft.creator.address !== proxy 
                         ) {
                           // user is not the creator now owns a copy of the object. hide
 
