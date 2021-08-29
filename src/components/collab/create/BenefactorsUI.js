@@ -83,7 +83,7 @@ export const BenefactorsUI = ({ benefactors, setBenefactors, onSelectPercentage,
     const disableAddButton = lastBenefactor ? (!lastBenefactor.address) : true
     const noCollaborators = totalParticipants === benefactors.length
 
-    console.log("Total", totalParticipants, "ben", benefactors.length)
+    // console.log("Total", totalParticipants, "ben", benefactors.length)
 
     const _selectPercentage = noCollaborators ? null : (index, percentage) => onSelectPercentage(index, percentage)
 
@@ -92,7 +92,7 @@ export const BenefactorsUI = ({ benefactors, setBenefactors, onSelectPercentage,
             <h2 className={headingClass}><strong>benefactors</strong></h2>
 
             {benefactors.length === 0 && (
-                <p className={notesClass}>Do you want to include anyone that wasn’t a collaborator, eg. a donation to the H=N Tezos Fountain?</p>
+                <p className={notesClass}>Do you want to include anyone that wasn’t a collaborator, eg. the team who made the collab contract ;)</p>
             )}
 
             {benefactors.length === 0 && (

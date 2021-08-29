@@ -11,17 +11,17 @@ export const ossProjects = [
     address: 'KT1BBYzfuYjgRdeHJ79vG3fZd8cHW9ueCEcN',
   },
   {
-    name: 'H=N Tezos Fountain',
-    address: 'tz1eggoxCes1qYRGLc3E1bg4uzuCUUuuQBb9',
+    name: 'Processing',
+    address: 'tz1aPHze1U5BEEKrGYt3dvY6aAQEeiWm8jjK',
   },
   {
     name: 'three.js',
     address: 'tz1ZUohCAkGjp7vPjQcC4VWcpgYZR1t3Si5C',
   },
   {
-    name: 'Processing',
-    address: 'tz1aPHze1U5BEEKrGYt3dvY6aAQEeiWm8jjK',
-  }
+    name: 'H=N Tezos Fountain',
+    address: 'tz1eggoxCes1qYRGLc3E1bg4uzuCUUuuQBb9',
+  },
 ]
 
 export const collaboratorTemplate = {
