@@ -8,7 +8,7 @@ import { CollabIssuerInfo } from '../collab/show/CollabIssuerInfo'
 import { userHasSignedObjkt } from '../collab/functions'
 import collabStyles from '../collab/styles.module.scss'
 import { SigningUI } from '../collab/sign/SigningUI'
-import { SigningSummary } from '../collab/show/SIgningSummary'
+import { SigningSummary } from '../collab/show/SigningSummary'
 import { CollaboratorType } from '../collab/constants'
 import classNames from 'classnames'
 
