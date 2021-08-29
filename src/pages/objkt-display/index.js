@@ -45,6 +45,7 @@ creator {
       holder_id
       holder {
         name
+        address
       }
     }
   }

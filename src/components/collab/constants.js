@@ -8,7 +8,7 @@ export const CollaboratorType = {
 export const ossProjects = [
   {
     name: 'WG3.2 (collab contract team)',
-    address: 'KT1CSfR6kx3uwDEXpwuCPnqp3MhpzfPmnLKj',
+    address: 'KT1BBYzfuYjgRdeHJ79vG3fZd8cHW9ueCEcN',
   },
   {
     name: 'H=N Tezos Fountain',

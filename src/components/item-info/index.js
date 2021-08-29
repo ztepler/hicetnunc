@@ -9,6 +9,8 @@ import { userHasSignedObjkt } from '../collab/functions'
 import collabStyles from '../collab/styles.module.scss'
 import { SigningUI } from '../collab/sign/SigningUI'
 import { SigningSummary } from '../collab/show/SIgningSummary'
+import { CollaboratorType } from '../collab/constants'
+import classNames from 'classnames'
 
 const _ = require('lodash')
 
@@ -105,13 +107,19 @@ export const ItemInfo = ({
 
     // Show the signing UI if required
     const userHasSigned = token_signatures.find(sig => sig.holder_id === acc?.address)
+    const coreParticipants = isCollab ? creator.shares[0].shareholder.filter(h => h.holder_type === CollaboratorType.CORE_PARTICIPANT) : null
+
+    const signStatusStyles = classNames(
+      collabStyles.flexBetween,
+      collabStyles.alignStart
+    )
 
     return (
       <>
         <div style={{ height: '30px' }}></div>
         <div className={styles.container}>
           <div className={styles.edition}>
-            <div>
+            <div className={collabStyles.relative}>
               <div className={styles.inline}>
                 <p className={styles.issuer}>{isCollab ? 'Collab:' : 'Issuer:'}&nbsp;</p>
 
@@ -175,8 +183,11 @@ export const ItemInfo = ({
                   </Button>
                   {showSignStatus && (
                     <div className={collabStyles.collabInfo}>
-                      <div className={collabStyles.flexBetween}>
-                        <SigningSummary collabs={ creator.shares[0] } signatures={ token_signatures } />
+                      <div className={signStatusStyles}>
+                        <SigningSummary
+                          coreParticipants={ coreParticipants }
+                          signatures={ token_signatures }
+                        />
                         <Button onClick={() => setShowSignStatus(false)}>
                           <Secondary>
                             close
