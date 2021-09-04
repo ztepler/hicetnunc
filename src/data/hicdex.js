@@ -77,14 +77,14 @@ export const getCollabsForAddress = `query GetCollabs($address: String!) {
 
 export async function fetchGraphQL(operationsDoc, operationName, variables) {
   const result = await fetch(
-    "https://api.hicdex.com/v1/graphql",
+    process.env.REACT_APP_GRAPHQL_API,
     {
-      method: "POST",
-      body: JSON.stringify({
-        query: operationsDoc,
-        variables: variables,
-        operationName: operationName
-      })
+        method: "POST",
+        body: JSON.stringify({
+            query: operationsDoc,
+            variables: variables,
+            operationName: operationName
+        })
     }
   );
 
