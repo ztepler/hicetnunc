@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Compressor from 'compressorjs'
 import { BottomBanner } from '../../components/bottom-banner'
 import { HicetnuncContext } from '../../context/HicetnuncContext'
@@ -20,6 +20,7 @@ import {
   MIN_ROYALTIES,
   MAX_ROYALTIES,
 } from '../../constants'
+import { fetchGraphQL, getCollabsForAddress } from '../../data/hicdex'
 
 const coverOptions = {
   quality: 0.85,
@@ -37,8 +38,9 @@ const thumbnailOptions = {
 const GENERATE_DISPLAY_AND_THUMBNAIL = true
 
 export const Mint = () => {
-  const { mint, getAuth, acc, setAccount, getProxy, setFeedback, syncTaquito } =
+  const { mint, getAuth, acc, setAccount, proxyAddress, proxyName, setFeedback, syncTaquito } =
     useContext(HicetnuncContext)
+
   // const history = useHistory()
   const [step, setStep] = useState(0)
   const [title, setTitle] = useState('')
@@ -50,8 +52,24 @@ export const Mint = () => {
   const [cover, setCover] = useState() // the uploaded or generated cover image
   const [thumbnail, setThumbnail] = useState() // the uploaded or generated cover image
   const [needsCover, setNeedsCover] = useState(false)
+  const [collabs, setCollabs] = useState([])
+
+  // On mount, see if there are available collab contracts
+  useEffect(() => {
+    // On boot, see what addresses the synced address can manage 
+    fetchGraphQL(getCollabsForAddress, 'GetCollabs', {
+      address: acc?.address,
+    }).then(({ data, errors }) => {
+      if (data) {
+        const shareholderInfo = data.hic_et_nunc_shareholder.map(s => s.split_contract);
+        setCollabs(shareholderInfo || [])
+      }
+    })
+  }, [acc])
+
 
   const handleMint = async () => {
+
     if (!acc) {
       // warning for sync
       setFeedback({
@@ -120,8 +138,8 @@ export const Mint = () => {
         confirm: false,
       })
 
-      // if proxyContract is selected, using it as a the miterAddress:
-      const minterAddress = getProxy() || acc.address
+      // if proxyContract is selected, using it as a the minterAddress:
+      const minterAddress = proxyAddress || acc.address
       // ztepler: I have not understand the difference between acc.address and getAuth here
       //    so I am using acc.address (minterAddress) in both nftCid.address and in mint call
 
@@ -260,6 +278,15 @@ export const Mint = () => {
     <Page title="mint" large>
       {step === 0 && (
         <>
+
+          {proxyAddress && (
+            <Container>
+              <Padding>
+                <p><span style={{ opacity: 0.5 }}>minting as</span> {proxyName || proxyAddress}</p>
+              </Padding>
+            </Container>
+          )}
+          
           <Container>
             <Padding>
               <Input
@@ -392,7 +419,7 @@ export const Mint = () => {
           </Container>
         </>
       )}
-{/*       <BottomBanner>
+      {/*       <BottomBanner>
       Collecting has been temporarily disabled. Follow <a href="https://twitter.com/hicetnunc2000" target="_blank">@hicetnunc2000</a> or <a href="https://discord.gg/jKNy6PynPK" target="_blank">join the discord</a> for updates.
       </BottomBanner> */}
     </Page>

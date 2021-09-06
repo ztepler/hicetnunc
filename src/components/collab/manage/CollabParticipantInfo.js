@@ -6,9 +6,9 @@ import styles from '../styles.module.scss'
 import { CollaboratorType } from '../constants'
 import { PATH } from '../../../constants'
 import { ParticipantList } from './ParticipantList'
-import { Link } from 'react-scroll'
+import { Link } from 'react-router-dom'
 
-export const CollabParticipantInfo = ({ collabData }) => {
+export const CollabParticipantInfo = ({ collabData, expanded = false }) => {
 
     const { proxyAddress, setProxyAddress, acc } = useContext(HicetnuncContext)
     const { administrator, contract, shareholder } = collabData
@@ -37,8 +37,14 @@ export const CollabParticipantInfo = ({ collabData }) => {
         <li className={listStyle} key={address}>
             <div className={styles.fullWidth}>
                 <div className={headerStyle}>
-                    
-                    {name && <h3><strong>{name}</strong></h3>}
+
+                    {name && (
+                        <h3>
+                            <strong>
+                                <Link to={`${PATH.COLLAB}/${address}`}>{name}</Link>
+                            </strong>
+                        </h3>
+                    )}
 
                     {address !== proxyAddress && isAdmin && (
                         <Button onClick={() => setProxyAddress(address, name)}>
@@ -53,18 +59,22 @@ export const CollabParticipantInfo = ({ collabData }) => {
                     )}
                 </div>
 
-                <p>
-                    <span className={styles.infoLabel}>address:</span>
-                    <Link className={styles.link} to={`${PATH.ISSUER}/${address}`}>{address}</Link>
-                </p> {/* <span className={styles.muted}>(admin)</span> */}
-
-                {coreParticipants.length > 0 && (
-                    <ParticipantList title="participants" participants={coreParticipants} />)
-                }
-
-                {benefactors.length > 0 && (
+                {expanded && (
                     <Fragment>
-                        <ParticipantList title="benefactors" participants={benefactors} />
+                        <p>
+                            <span className={styles.infoLabel}>address:</span>
+                            <Link className={styles.link} to={`${PATH.ISSUER}/${address}`}>{address}</Link>
+                        </p> {/* <span className={styles.muted}>(admin)</span> */}
+
+                        {coreParticipants.length > 0 && (
+                            <ParticipantList title="participants" participants={coreParticipants} />)
+                        }
+
+                        {benefactors.length > 0 && (
+                            <Fragment>
+                                <ParticipantList title="benefactors" participants={benefactors} />
+                            </Fragment>
+                        )}
                     </Fragment>
                 )}
             </div>

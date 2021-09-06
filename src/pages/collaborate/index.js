@@ -2,10 +2,10 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Page, Container, Padding } from '../../components/layout'
 import { Button, Primary } from '../../components/button'
 import { CollabDisplay } from '../../components/collab/show/CollabDisplay'
-import { SelectProxyContract, CreateCollaboration } from './tabs'
+import { CreateCollaboration } from './tabs'
 import { Menu } from '../../components/menu'
 import { HicetnuncContext } from '../../context/HicetnuncContext'
-import { CollabContractsOverview } from './tabs/overview'
+import { CollabContractsOverview } from './tabs/manage'
 
 const TABS = [
     { title: 'manage', component: CollabContractsOverview },
@@ -18,7 +18,7 @@ const Collaborate = () => {
 
     const { proxyAddress, originatedContract } = useContext(HicetnuncContext)
 
-    console.log("Main Collaborate component - originated contract is", originatedContract)
+    // console.log("Main Collaborate component - originated contract is", originatedContract)
 
     // If an address is created, update the tab
     useEffect(() => {

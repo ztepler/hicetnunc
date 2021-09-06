@@ -184,6 +184,8 @@ class HicetnuncContextProviderClass extends Component {
           }
         ]
 
+        console.log("LIST", list)
+
         let batch = await Tezos.wallet.batch(list);
         return await batch.send()
       },

@@ -258,18 +258,17 @@ export const ObjktDisplay = () => {
                         // if nft.owners exist and this is a private route, try to hide the tab.
                         // if nft.owners fails, always show route!
                         if (nft?.token_holders && tab.private) {
+
                           let holders_arr = nft.token_holders.map(
                             (e) => e.holder_id
                           )
 
-                        // const isCollabAdmin = nft.creator.is_split ? nft.creator.shares[0].administrator === address : false
+                          // const isCollabAdmin = nft.creator.is_split ? nft.creator.shares[0].administrator === address : false
+                          const isHolder = holders_arr.includes(address) || holders_arr.includes(proxy)
+                          const isCreator = nft.creator.address === address || nft.creator.address === proxy
 
-                        if (
-                          holders_arr.includes(address) === false &&
-                          nft.creator.address !== address &&
-                          nft.creator.address !== proxy 
-                        ) {
-                          // user is not the creator now owns a copy of the object. hide
+                          if (!isHolder && !isCreator) {
+                            // user is not the creator now owns a copy of the object. hide
                             return null
                           }
                         }
