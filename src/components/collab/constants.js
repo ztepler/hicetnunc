@@ -5,6 +5,7 @@ export const CollaboratorType = {
   CORE_PARTICIPANT: 'core_participant',
 }
 
+// TODO - get this manageable on-chain
 export const ossProjects = [
   {
     name: 'WG3.2 (collab contract team)',

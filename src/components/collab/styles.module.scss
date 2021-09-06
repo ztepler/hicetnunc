@@ -289,3 +289,33 @@
   line-height: 1.5;
   color: #999;
 }
+
+.collabTable {
+  th {
+    text-align: left;
+    width: 25%;
+    vertical-align: top;
+    padding: 0.25em;
+    border:none;
+  }
+
+  td {
+    padding: 0.25em;
+    width: 75%;
+    vertical-align: top;
+  }
+
+  tr {
+    // border: 1px solid var(--border-color);
+  }
+}
+
+.infoLabel {
+  display: inline-block;
+  min-width: 180px;
+  opacity: 0.75;
+}
+
+.fullWidth {
+  width: 100%;
+}

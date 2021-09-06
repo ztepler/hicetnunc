@@ -15,6 +15,7 @@ export const ReviewStage = ({ collaborators, benefactors, onEdit }) => {
 
     // Proxy contract creation function
     const { originateProxy } = useContext(HicetnuncContext) // use mockProxy instead for fake return data
+    const { mockProxy } = useContext(HicetnuncContext) // use mockProxy instead for fake return data
 
     const originateContract = async () => {
         // TODO: need some UI to select admin contract

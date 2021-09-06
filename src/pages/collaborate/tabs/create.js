@@ -8,6 +8,15 @@ import { ReviewStage } from '../../../components/collab/create/ReviewStage'
 import styles from '../styles.module.scss'
 import classNames from 'classnames'
 // import { mockData } from '../../../components/collab/constants'
+const mockCoreData = [{
+    address: 'tz1cCkFpkSezV7TpmSBfKzAKADxBUXPjNsJD',
+    shares: 95,
+}]
+
+const mockBenefactorData = [{
+    address: 'tz1aPHze1U5BEEKrGYt3dvY6aAQEeiWm8jjK',
+    shares: 5,
+}]
 
 export const CreateCollaboration = () => {
 
@@ -17,6 +26,8 @@ export const CreateCollaboration = () => {
     const [editCollaborators, setEditCollaborators] = useState(true)
     const [collaborators, setCollaborators] = useState([])
     const [benefactors, setBenefactors] = useState([])
+    // const [collaborators, setCollaborators] = useState(mockCoreData)
+    // const [benefactors, setBenefactors] = useState(mockBenefactorData)
 
     // For adding people not directly involved with the creation
     const [showBenefactorsUI, setShowBenefactorsUI] = useState(false);
@@ -52,7 +63,7 @@ export const CreateCollaboration = () => {
         const updatedBenefactors = [...benefactors]
 
         console.log("_calculateShares", index, percentage)
-        
+
         updatedBenefactors[index] = {
             ...benefactor,
             shares: Math.ceil(totalShares * percentage / 100),

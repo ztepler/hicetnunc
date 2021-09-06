@@ -7,8 +7,8 @@ export const ParticipantList = ({ title, participants }) => {
     return (
         <div>
             <div className={styles.flex}>
-                {title && <h3 className={styles.muted}><span>{title}:</span></h3>}
-                <div className={''}>
+                {title && <h3 className={styles.infoLabel}><span>{title}:</span></h3>}
+                <div>
                     {
                         participants.map((collabData, index) =>
                             [

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext, useEffect, Fragment } from 'react'
 import { HicetnuncContext } from '../../../context/HicetnuncContext'
 import { Container, Padding } from '../../../components/layout'
 import styles from '../../../components/collab/styles.module.scss'
@@ -7,7 +7,7 @@ import { CollabParticipantInfo } from '../../../components/collab/manage/CollabP
 
 export const CollabContractsOverview = () => {
 
-    const { acc } = useContext(HicetnuncContext)
+    const { acc, load, originatedContract } = useContext(HicetnuncContext)
     const [collabs, setCollabs] = useState([])
 
     useEffect(() => {
@@ -20,7 +20,7 @@ export const CollabContractsOverview = () => {
                 setCollabs(shareholderInfo || [])
             }
         })
-    }, [])
+    }, [acc])
 
     return (
         <Container>
@@ -38,8 +38,9 @@ export const CollabContractsOverview = () => {
                 )}
 
                 {collabs.length === 0 && (
-                    <p>You aren’t part of any collaborations at the moment</p>
+                    <p>{ originatedContract ? 'Your collab contract is being created... please wait' : (load ? 'Loading...' : 'You aren’t part of any collaborations at the moment') }</p>
                 )}
+
             </Padding>
         </Container>
     )

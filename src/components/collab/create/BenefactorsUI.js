@@ -115,7 +115,7 @@ export const BenefactorsUI = ({ benefactors, setBenefactors, onSelectPercentage,
                                     onRemove={() => removeBenefactor(index)}
                                     onAdd={addBenefactor}
                                     onPasteMulti={setMultilineContent}
-                                    onSelectPercentage={percentage => _selectPercentage(index, percentage)}
+                                    onSelectPercentage={_selectPercentage ? percentage => _selectPercentage(index, percentage) : null}
                                 />
                             )
                         })}

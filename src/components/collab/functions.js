@@ -17,6 +17,11 @@ export const packParticipantMap = (participantData) => {
 }
 
 export const validAddress = (input) => {
+  
+  if (!input.length) {
+    return false
+  }
+
   return (['tz', 'KT'].indexOf(input.substr(0, 2)) > -1) && (input.length === 36)
 }
 

@@ -18,6 +18,8 @@ export const CollaboratorRow = ({ collaborator, onUpdate, onAdd, onRemove, onPas
         const { address, shares } = collaborator
 
         if (!validAddress(address)) {
+            setAddress('');
+            setMeta()
             return
         }
         

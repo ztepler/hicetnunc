@@ -28,38 +28,48 @@ export const CollabParticipantInfo = ({ collabData }) => {
         [styles.border]: contract.address === proxyAddress,
     })
 
+    const headerStyle = classNames(styles.flex, styles.flexBetween, styles.alignStart, styles.fullWidth)
+
     // We'll show the name of the contract if set
     const { name, address } = contract
 
-    return <li className={listStyle} key={address}>
-        <div>
-            {name && <h3><strong>{name}</strong></h3>}
-            <p>
-                <span className={styles.muted}>address:</span>
-                <Link className={styles.link} to={`${PATH.ISSUER}/${address}`}>{address}</Link>
-            </p> {/* <span className={styles.muted}>(admin)</span> */}
+    return (
+        <li className={listStyle} key={address}>
+            <div className={styles.fullWidth}>
+                <div className={headerStyle}>
+                    
+                    {name && <h3><strong>{name}</strong></h3>}
 
-            {coreParticipants.length > 0 && (
-                <ParticipantList title="participants" participants={coreParticipants} />)
-            }
+                    {address !== proxyAddress && isAdmin && (
+                        <Button onClick={() => setProxyAddress(address, name)}>
+                            <Purchase>sign in</Purchase>
+                        </Button>
+                    )}
 
-            {benefactors.length > 0 && (
-                <Fragment>
-                    <ParticipantList title="benefactors" participants={benefactors} />
-                </Fragment>
-            )}
-        </div>
+                    {address === proxyAddress && isAdmin && (
+                        <Button onClick={() => setProxyAddress(null)}>
+                            <Purchase>sign out</Purchase>
+                        </Button>
+                    )}
+                </div>
 
-        {address !== proxyAddress && isAdmin && (
-            <Button onClick={() => setProxyAddress(address, name)}>
-                <Purchase>Use this contract</Purchase>
-            </Button>
-        )}
+                <p>
+                    <span className={styles.infoLabel}>address:</span>
+                    <Link className={styles.link} to={`${PATH.ISSUER}/${address}`}>{address}</Link>
+                </p> {/* <span className={styles.muted}>(admin)</span> */}
 
-        {address === proxyAddress && isAdmin && (
-            <Button onClick={() => setProxyAddress(null)}>
-                <Purchase>Sign Out</Purchase>
-            </Button>
-        )}
-    </li>
+                {coreParticipants.length > 0 && (
+                    <ParticipantList title="participants" participants={coreParticipants} />)
+                }
+
+                {benefactors.length > 0 && (
+                    <Fragment>
+                        <ParticipantList title="benefactors" participants={benefactors} />
+                    </Fragment>
+                )}
+            </div>
+
+
+        </li>
+    )
 }

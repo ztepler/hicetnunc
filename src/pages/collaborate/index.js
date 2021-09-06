@@ -8,8 +8,8 @@ import { HicetnuncContext } from '../../context/HicetnuncContext'
 import { CollabContractsOverview } from './tabs/overview'
 
 const TABS = [
-    { title: 'create', component: CreateCollaboration },
     { title: 'manage', component: CollabContractsOverview },
+    { title: 'create', component: CreateCollaboration },
 ]
 
 const Collaborate = () => {
@@ -18,10 +18,12 @@ const Collaborate = () => {
 
     const { proxyAddress, originatedContract } = useContext(HicetnuncContext)
 
+    console.log("Main Collaborate component - originated contract is", originatedContract)
+
     // If an address is created, update the tab
     useEffect(() => {
         if (originatedContract) {
-            setTabIndex(1)
+            setTabIndex(0)
         }
     }, [proxyAddress, originatedContract])
 
