@@ -83,9 +83,7 @@ export const BenefactorsUI = ({ benefactors, setBenefactors, onSelectPercentage,
     const disableAddButton = lastBenefactor ? (!lastBenefactor.address) : true
     const noCollaborators = totalParticipants === benefactors.length
 
-    // console.log("Total", totalParticipants, "ben", benefactors.length)
 
-    const _selectPercentage = noCollaborators ? null : (index, percentage) => onSelectPercentage(index, percentage)
 
     return (
         <Fragment>
@@ -115,7 +113,7 @@ export const BenefactorsUI = ({ benefactors, setBenefactors, onSelectPercentage,
                                     onRemove={() => removeBenefactor(index)}
                                     onAdd={addBenefactor}
                                     onPasteMulti={setMultilineContent}
-                                    onSelectPercentage={_selectPercentage ? percentage => _selectPercentage(index, percentage) : null}
+                                    onSelectPercentage={ noCollaborators ? null : (percentage) => onSelectPercentage(index, percentage) }
                                 />
                             )
                         })}

@@ -13,6 +13,7 @@ import { GetUserMetadata } from '../../data/api'
 import { ResponsiveMasonry } from '../../components/responsive-masonry'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import styles from './styles.module.scss'
+import { getCollabTokensForAddress } from '../../data/hicdex'
 
 const axios = require('axios')
 const fetch = require('node-fetch')
@@ -224,6 +225,29 @@ async function fetchCreations(addr) {
   return result
 }
 
+async function fetchCollabs(address) {
+
+  const { errors, data } = await fetchGraphQL(
+    getCollabTokensForAddress,
+    'GetCollabTokens',
+    { address }
+  )
+  if (errors) {
+    console.error(errors)
+  }
+  const result = data.hic_et_nunc_shareholder
+
+  // This is the shareholder info - we need to map this into a form where the OBJKTs can be shown
+
+  let tokens = [];
+
+  if (result) {
+    result.forEach((contract) => tokens = tokens.concat(contract.split_contract.contract.tokens))
+  }
+
+  return tokens
+}
+
 async function fetchTz(addr) {
   const { errors, data } = await fetchGraphQL(query_tz, 'addressQuery', {
     address: addr,
@@ -253,6 +277,7 @@ export default class Display extends Component {
     results: [],
     objkts: [],
     creations: [],
+    collabs: [],
     collection: [],
     forSale: [],
     notForSale: [],
@@ -263,13 +288,15 @@ export default class Display extends Component {
     collabsState: false,
     marketState: false,
     collectionType: 'notForSale',
+    showUnverifiedCollabObjkts: false,
     hdao: 0,
   }
 
   componentWillMount = async () => {
 
     const id = window.location.pathname.split('/')[1]
-    // console.log(window.location.pathname.split('/'))
+
+    console.log('Display componenet', window.location.pathname.split('/'))
 
     if (id === 'tz') {
 
@@ -313,16 +340,16 @@ export default class Display extends Component {
     } else {
       let res = await fetchSubjkts(decodeURI(window.location.pathname.split('/')[1]))
       // console.log(decodeURI(window.location.pathname.split('/')[1]))
-      console.log(res)
+      // console.log(res)
       if (res[0].metadata_file) {
         let meta = await axios.get('https://cloudflare-ipfs.com/ipfs/' + res[0].metadata_file.split('//')[1]).then(res => res.data)
-        console.log(meta)
+        // console.log(meta)
         if (meta.description) this.setState({ description: meta.description })
         if (meta.identicon) this.setState({ identicon: meta.identicon })
       }
 
       if (res.length >= 1) {
-        console.log(res)
+        // console.log(res)
 
         this.setState({
           wallet: res[0].address,
@@ -364,15 +391,16 @@ export default class Display extends Component {
   }
 
   creations = async () => {
+
     this.setState({
       creationsState: true,
       collectionState: false,
+      collabsState: false,
       collectionType: 'notForSale'
     })
 
     let list = await getRestrictedAddresses()
-    // console.log(this.state.wallet)
-    // console.log(!list.includes(this.state.wallet))
+
     if (!list.includes(this.state.wallet)) {
       this.setState({ creations: await fetchCreations(this.state.wallet) })
       this.setState({ objkts: this.state.creations, loading: false, items: [] })
@@ -440,23 +468,14 @@ export default class Display extends Component {
   }
 
   combineCollection = async (collection, swaps) => {
-    let combinedCollection = [];
-
-    collection.forEach(function (item) {
-      combinedCollection.push(item)
-    })
-
-    swaps.forEach(function (item) {
-      combinedCollection.push(item)
-    })
-
-    return combinedCollection;
+    return [
+      ...collection,
+      ...swaps.filter(s => collection.find(objkt => (objkt.id === s.id)))
+    ]
   }
 
   sortCollection = async (unsorted) => {
-    unsorted.sort(function (a, b) {
-      return b.token.id - a.token.id
-    })
+    unsorted.sort((a, b) => b.token.id - a.token.id)
   }
 
   collectionFull = async () => {
@@ -464,7 +483,8 @@ export default class Display extends Component {
 
     this.setState({
       creationsState: false,
-      collectionState: true
+      collectionState: true,
+      collabsState: false,
     })
 
     this.setState({ collectionType: 'notForSale' })
@@ -496,26 +516,49 @@ export default class Display extends Component {
 
   collabs = async () => {
 
+    console.log("Loading collabs")
+
     let list = await getRestrictedAddresses()
+
     if (!list.includes(this.state.wallet)) {
-      this.setState({ objkts: await fetchCollection(this.state.wallet), loading: false, items: [] })
+
+      this.setState({
+        objkts: [],
+        loading: true,
+        creationsState: false,
+        collectionState: false,
+        collabsState: true,
+        marketState: false,
+      })
+
+      fetchCollabs(this.state.wallet).then(collabs => {
+        this.setState({ collabs })
+
+        const objktsToShow = this.state.showUnverifiedCollabObjkts ? collabs : collabs.filter(objkt => objkt.is_signed)
+
+        this.setState({
+          objkts: objktsToShow,
+          loading: false,
+          items: objktsToShow.slice(0, 15),
+          offset: 15,
+        })
+      })
     }
-
-    // this.setState({ items: this.state.objkts.slice(0, 20), offset: 20 })
-
-    // this.setState({
-    //   creationsState: false,
-    //   collectionState: true,
-    //   marketState: false
-    // })
 
     // if (this.state.subjkt !== '') {
     //   // if alias route
-    //   this.props.history.push(`/${this.state.subjkt}/collection`)
+    //   this.props.history.push(`/${this.state.subjkt}/collabs`)
     // } else {
     //   // if tz/wallethash route
-    //   this.props.history.push(`/tz/${this.state.wallet}/collection`)
+    //   this.props.history.push(`/tz/${this.state.wallet}/collabs`)
     // }
+    this.updateLocation('collabs')
+  }
+
+  updateLocation = (slug) => {
+    const { subjkt, wallet } = this.state
+    console.log("updateLocation", subjkt, wallet, slug)
+    this.props.history.push(`/${subjkt === '' ? wallet : subjkt}/${slug}`)
   }
 
   collectionForSale = async () => {
@@ -552,32 +595,17 @@ export default class Display extends Component {
 
   // called if there's no redirect
   onReady = async () => {
+    const slug = window.location.pathname.split('/')[this.state.subjkt !== '' ? 2 : 3];
 
-    // based on route, define initial state
-    if (this.state.subjkt !== '') {
+    // Make sure it's in the allowed tabs. If not, default to creations
+    let tabFunc = ['creations', 'collection', 'collabs'].indexOf(slug) > -1 ? slug : 'creations';
 
-      // if alias route
-      if (window.location.pathname.split('/')[2] === 'creations') {
-        this.creations()
-      } else if (window.location.pathname.split('/')[2] === 'collection') {
-        this.collectionFull()
-      } else if (window.location.pathname.split('/')[2] === 'collabs') {
-        this.collabs()
-      } else {
-        this.creations()
-      }
-    } else {
-      // if tz wallet route
-      if (window.location.pathname.split('/')[3] === 'creations') {
-        this.creations()
-      } else if (window.location.pathname.split('/')[3] === 'collection') {
-        this.collectionFull()
-      } else if (window.location.pathname.split('/')[3] === 'collabs') {
-        this.collabs()
-      } else {
-        this.creations()
-      }
+    // Strangely named function for collection
+    if (slug === 'collection') {
+      tabFunc = 'collectionFull'
     }
+  
+    this[tabFunc]()
   }
 
   loadMore = () => {
@@ -961,6 +989,124 @@ export default class Display extends Component {
           </Container>
         )}
 
+        {!this.state.loading && this.state.collabsState && (
+          <Container xlarge>
+            {this.state.filter && (
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <Button
+                  onClick={() => { this.creations() }}>
+                  <div className={styles.tag}>
+                    all
+                  </div>
+                </Button>
+                <Button
+                  onClick={() => {
+                    this.creationsForSale();
+                  }}>
+                  <div className={styles.tag}>
+                    for sale
+                  </div>
+                </Button>
+                <Button
+                  onClick={() => { this.creationsNotForSale() }}>
+                  <div className={styles.tag}>
+                    not for sale
+                  </div>
+                </Button>
+              </div>
+            )}
+
+            {this.state.collectionType == 'forSale' ?
+              <>
+                {this.context.acc != null && this.context.acc.address == this.state.wallet ?
+                  <>
+                    {Object.keys(this.state.marketV1).length !== 0 && (
+                      <>
+                        <Container>
+                          <Padding>
+                            <p>We're currently migrating the marketplace smart contract. We ask for
+                              users to cancel their listings as the v1 marketplace will no longer be
+                              maintained. Auditing tools for the v1 protocol can be found at <a href='https://hictory.xyz'>hictory.xyz</a>
+                            </p>
+                          </Padding>
+                        </Container>
+                      </>
+                    )}
+
+                    {this.state.marketV1.length !== 0 ?
+                      <Container>
+                        <Padding>
+                          <p>
+                            One can delist multiple swaps in once batch transaction or delist each single one at a time.
+                          </p>
+                          <br />
+                          <Button onClick={this.cancel_batch}>
+                            <Primary>
+                              Batch Cancel
+                            </Primary>
+                          </Button>
+                        </Padding>
+                      </Container>
+                      :
+                      null
+                    }
+
+                    {this.state.marketV1.map((e, key) => {
+                      // console.log(e)
+                      return (
+                        <>
+                          <Container key={key}>
+                            <Padding>
+                              <Button to={`${PATH.OBJKT}/${e.token_id}`}>
+                                {/* {console.log(e)} */}
+                                <Primary>
+                                  <strong>{e.amount_left}x OBJKT#{e.token_id} {e.price}µtez</strong>
+                                </Primary>
+                              </Button>
+                              <Button onClick={() => this.context.cancel(e.id)}>
+                                <Secondary>
+                                  Cancel Swap
+                                </Secondary>
+                              </Button>
+                            </Padding>
+                          </Container>
+                        </>
+                      )
+                    })
+                    }
+                  </> : null}
+              </>
+              :
+              null
+            }
+
+            <InfiniteScroll
+              dataLength={this.state.items.length}
+              next={this.loadMore}
+              hasMore={this.state.hasMore}
+              loader={undefined}
+              endMessage={undefined}
+            >
+              <ResponsiveMasonry>
+                {this.state.items.map((nft) => {
+                  return (
+                    <Button key={nft.id} to={`${PATH.OBJKT}/${nft.id}`}>
+                      <div className={styles.container}>
+                        {renderMediaType({
+                          mimeType: nft.mime,
+                          artifactUri: nft.artifact_uri,
+                          displayUri: nft.display_uri,
+                          displayView: true
+                        })}
+                      </div>
+                    </Button>
+                  )
+                })}
+              </ResponsiveMasonry>
+            </InfiniteScroll>
+          </Container>
+        )}
+
         {!this.state.loading && this.state.collectionState && (
           <Container xlarge>
             {this.state.filter && (
@@ -1078,7 +1224,7 @@ export default class Display extends Component {
 
           </Container>
         )}
-{/*       <BottomBanner>
+        {/*       <BottomBanner>
         API is down due to heavy server load — We're working to fix the issue — please be patient with us. <a href="https://discord.gg/mNNSpxpDce" target="_blank">Join the discord</a> for updates.
       </BottomBanner> */}
       </Page>

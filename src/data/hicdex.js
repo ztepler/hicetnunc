@@ -55,6 +55,33 @@ export const getCollabCreations = `query GetCollabCreations($address: String!) {
   }
 }`
 
+export const getCollabTokensForAddress = `query GetCollabTokens($address: String!) {
+  hic_et_nunc_shareholder(where: {holder_id: {_eq: $address}, holder_type: {_eq: "core_participant"}}) {
+    split_contract {
+      contract {
+        address
+        name
+        tokens {
+          id
+          is_signed
+          artifact_uri
+          display_uri
+          thumbnail_uri
+          timestamp
+          mime
+          title
+          description
+          supply
+          royalties
+          creator {
+            address
+          }
+        }
+      }
+    }
+  }
+}`
+
 export const getCollabsForAddress = `query GetCollabs($address: String!) {
   hic_et_nunc_shareholder(where: {holder_id: {_eq: $address}, holder_type: {_eq: "core_participant"}}) {
     split_contract {
@@ -79,12 +106,12 @@ export async function fetchGraphQL(operationsDoc, operationName, variables) {
   const result = await fetch(
     process.env.REACT_APP_GRAPHQL_API,
     {
-        method: "POST",
-        body: JSON.stringify({
-            query: operationsDoc,
-            variables: variables,
-            operationName: operationName
-        })
+      method: "POST",
+      body: JSON.stringify({
+        query: operationsDoc,
+        variables: variables,
+        operationName: operationName
+      })
     }
   );
 
