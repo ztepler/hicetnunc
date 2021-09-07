@@ -17,8 +17,7 @@ export const CollaboratorRow = ({ collaborator, onUpdate, onAdd, onRemove, onPas
     useEffect(() => {
         const { address, shares } = collaborator
 
-        if (!validAddress(address)) {
-            setAddress('');
+        if (address === '' && meta) {
             setMeta()
             return
         }
