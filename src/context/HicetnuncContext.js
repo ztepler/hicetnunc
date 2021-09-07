@@ -479,15 +479,16 @@ class HicetnuncContextProviderClass extends Component {
 
       burn: async (objkt_id, amount) => {
         var tz = await wallet.client.getActiveAccount()
-        const objktsAddress = this.state.proxyAddress || this.state.objkts;
+        const objktsOrProxy = this.state.proxyAddress || this.state.objkts;
+        const addressFrom = this.state.proxyAddress || tz.address;
 
         await Tezos.wallet
-          .at(objktsAddress)
+          .at(objktsOrProxy)
           .then(async (c) =>
             c.methods
               .transfer([
                 {
-                  from_: tz.address,
+                  from_: addressFrom,
                   txs: [
                     {
                       to_: 'tz1burnburnburnburnburnburnburjAYjjX',
