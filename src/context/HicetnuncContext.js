@@ -23,9 +23,9 @@ const eztz = require('eztz-lib')
 export const HicetnuncContext = createContext()
 
 // TODO: move this schema into separate place?
-const createProxySchema = `
-  (map address (pair (bool %isCore) (nat %share))))
-`
+// const createProxySchema = `
+//   (map address (pair (bool %isCore) (nat %share))))
+// `
 
 //const bandwidth = navigator.connection.downlink
 //const connectionType = navigator.connection

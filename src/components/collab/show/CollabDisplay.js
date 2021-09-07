@@ -148,7 +148,8 @@ export const CollabDisplay = () => {
                 </Container>
             )}
 
-            <div>Tab selection here</div>
+                                
+            {/* <div>Tab selection here</div> */}
 
 
             {!loading && (
