@@ -1,4 +1,4 @@
-import { useParams } from 'react-router'
+import { Redirect, useParams } from 'react-router'
 import { useEffect, useState, useContext } from 'react'
 import { PATH } from '../../../constants'
 import { Loading } from '../../loading'
@@ -13,15 +13,16 @@ import { fetchGraphQL, getCollabCreations } from '../../../data/hicdex'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import collabStyles from '../styles.module.scss'
 import classNames from 'classnames'
-import { CollaboratorType } from '../constants'
+import { CollaboratorType, TabIndex } from '../constants'
 import { ParticipantList } from '../manage/ParticipantList'
-import QRCode from 'react-qr-code'
-
-console.log(collabStyles)
+// import QRCode from 'react-qr-code'
 
 export const CollabDisplay = () => {
 
+    console.log("CollabDisplay loaded")
+
     // Local state
+    const [tabIndex, setTabIndex] = useState(TabIndex.CREATIONS)
     const [creations, setCreations] = useState([])
     const [contractInfo, setContractInfo] = useState()
     const [showBenefactors, setShowBenefactors] = useState(false)
@@ -29,20 +30,19 @@ export const CollabDisplay = () => {
     // const [displayName, setDisplayName] = useState()
     // const [address, setAddress] = useState()
 
+    const chunkSize = 20
     const [items, setItems] = useState([])
-    const [offset, setOffset] = useState(0)
+    const [offset, setOffset] = useState(chunkSize)
     const [loading, setLoading] = useState(true)
 
-    // Probably OK as a constant for now
-    const chunkSize = 20
-
     // The route passes the contract address in as parameter "id"
-    const { id } = useParams()
+    const { id, tab } = useParams()
 
     useEffect(() => {
         fetchGraphQL(getCollabCreations, 'GetCollabCreations', {
             address: id,
         }).then(({ data, errors }) => {
+            console.log("CollabDisplay", data)
             if (data) {
                 setCreations(data.hic_et_nunc_token)
                 setContractInfo(data.hic_et_nunc_splitcontract[0])
@@ -86,6 +86,16 @@ export const CollabDisplay = () => {
     // Benefactors
     const benefactors = contractInfo?.shareholder
         .filter(({ holder_type }) => holder_type === CollaboratorType.BENEFACTOR);
+
+
+    const oldContractAddresses = [
+        'KT1CSfR6kx3uwDEXpwuCPnqp3MhpzfPmnLKj',
+        'KT1XhXv6jBpkahnvrtdiSi8foWXneWEjcz6F',
+    ]
+
+    if (oldContractAddresses.indexOf(id) > -1) {
+        return <Redirect to={`${PATH.ISSUER}/${id}`} />
+    }
 
     return (
         <Page title={`Collab: ${displayName}`}>
@@ -137,6 +147,8 @@ export const CollabDisplay = () => {
                     </Padding>
                 </Container>
             )}
+
+            <div>Tab selection here</div>
 
 
             {!loading && (

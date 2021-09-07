@@ -6,21 +6,32 @@ import { fetchGraphQL, getCollabsForAddress } from '../../../data/hicdex'
 import { CollabParticipantInfo } from '../../../components/collab/manage/CollabParticipantInfo'
 import { Button, Purchase, Secondary } from '../../../components/button'
 import classNames from 'classnames'
+import { Input } from '../../../components/input'
 
-export const CollabContractsOverview = () => {
+export const CollabContractsOverview = ({ showAdminOnly = false }) => {
 
-    const { acc, load, originatedContract } = useContext(HicetnuncContext)
+    const { acc, load, originatedContract, setProxyAddress } = useContext(HicetnuncContext)
     const [collabs, setCollabs] = useState([])
     const [showDetail, setShowDetail] = useState(false)
 
+    // TODO - maybe allow manual input of a KT address
+    // const [addAddressManually, setAddAddressManually] = useState(false)
+    // const [manualAddress, setManualAddress] = useState('')
+
     useEffect(() => {
+        if (!acc) {
+            return
+        }
+
         // On boot, see what addresses the synced address can manage 
         fetchGraphQL(getCollabsForAddress, 'GetCollabs', {
-            address: acc?.address,
+            address: acc.address,
         }).then(({ data, errors }) => {
             if (data) {
-                const shareholderInfo = data.hic_et_nunc_shareholder.map(s => s.split_contract);
-                setCollabs(shareholderInfo || [])
+                const shareholderInfo = data.hic_et_nunc_shareholder.map(s => s.split_contract)
+                const allContracts = shareholderInfo || []
+                const contractsToShow = showAdminOnly ? allContracts.filter(contract => contract.administrator === acc.address) : allContracts
+                setCollabs(contractsToShow)
             }
         })
     }, [acc])
@@ -34,7 +45,14 @@ export const CollabContractsOverview = () => {
                 {collabs.length > 0 && (
                     <div>
                         <div className={headerStyle}>
-                            <p className={styles.mb1}>You are a participant in these collabs:</p>
+                            {showAdminOnly && (
+                                <p className={styles.mb1}>You can mint with these collab contracts:</p>
+
+                            )}
+
+                            {!showAdminOnly && (
+                                <p className={styles.mb1}>You are a participant in these collabs:</p>
+                            )}
 
                             <div className={styles.mb2}>
                                 <Button onClick={() => setShowDetail(!showDetail)}>
@@ -52,6 +70,32 @@ export const CollabContractsOverview = () => {
                                 />
                             ))}
                         </ul>
+
+                        {/* {!addAddressManually && (
+                            <Button onClick={() => setAddAddressManually(true)}>
+                                <Secondary>
+                                    add address manually
+                                </Secondary>
+                            </Button>
+                        )}
+
+                        {addAddressManually && (
+                            <div className={headerStyle}>
+                                <Input
+                                    type="text"
+                                    label="KT address"
+                                    onChange={event => setManualAddress(event.target.value)}
+                                    placeholder="KT..."
+                                    value={manualAddress}
+                                    autoFocus={true}
+                                />
+                                <Button onClick={() => setProxyAddress(manualAddress)}>
+                                    <Purchase>
+                                        sign in
+                                    </Purchase>
+                                </Button>
+                            </div>
+                        )} */}
                     </div>
                 )}
 

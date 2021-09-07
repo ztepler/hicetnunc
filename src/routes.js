@@ -40,7 +40,7 @@ export const routes = [
   },
   {
     exact: false,
-    path: '/kt/:id',
+    path: '/kt/:id/:tab?',
     component: CollabDisplay,
   },
   {

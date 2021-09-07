@@ -5,6 +5,12 @@ export const CollaboratorType = {
   CORE_PARTICIPANT: 'core_participant',
 }
 
+export const TabIndex = {
+  CREATIONS: 0,
+  COLLECTION: 1,
+  COLLABS: 2,
+}
+
 // TODO - get this manageable on-chain
 export const ossProjects = [
   {

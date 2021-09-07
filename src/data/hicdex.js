@@ -102,6 +102,12 @@ export const getCollabsForAddress = `query GetCollabs($address: String!) {
   }
 }`
 
+export const getNameForAddress = `query GetNameForAddress($address: String!) {
+  hic_et_nunc_holder(where: {address: {_eq: $address}}) {
+    name
+  }
+}`
+
 export async function fetchGraphQL(operationsDoc, operationName, variables) {
   const result = await fetch(
     process.env.REACT_APP_GRAPHQL_API,

@@ -20,7 +20,10 @@ import {
   MIN_ROYALTIES,
   MAX_ROYALTIES,
 } from '../../constants'
-import { fetchGraphQL, getCollabsForAddress } from '../../data/hicdex'
+import { fetchGraphQL, getCollabsForAddress, getNameForAddress } from '../../data/hicdex'
+import collabStyles from '../../components/collab/styles.module.scss'
+import classNames from 'classnames'
+import { CollabContractsOverview } from '../collaborate/tabs/manage'
 
 const coverOptions = {
   quality: 0.85,
@@ -38,12 +41,13 @@ const thumbnailOptions = {
 const GENERATE_DISPLAY_AND_THUMBNAIL = true
 
 export const Mint = () => {
-  const { mint, getAuth, acc, setAccount, proxyAddress, proxyName, setFeedback, syncTaquito } =
+  const { mint, acc, setAccount, proxyAddress, proxyName, setFeedback, syncTaquito } =
     useContext(HicetnuncContext)
 
   // const history = useHistory()
   const [step, setStep] = useState(0)
   const [title, setTitle] = useState('')
+  const [mintName, setMintName] = useState('')
   const [description, setDescription] = useState('')
   const [tags, setTags] = useState('')
   const [amount, setAmount] = useState()
@@ -53,6 +57,8 @@ export const Mint = () => {
   const [thumbnail, setThumbnail] = useState() // the uploaded or generated cover image
   const [needsCover, setNeedsCover] = useState(false)
   const [collabs, setCollabs] = useState([])
+  const [selectCollab, setSelectCollab] = useState(false)
+
 
   // On mount, see if there are available collab contracts
   useEffect(() => {
@@ -65,8 +71,24 @@ export const Mint = () => {
         setCollabs(shareholderInfo || [])
       }
     })
+
+    updateName()
   }, [acc])
 
+  useEffect(() => {
+    updateName()
+    setSelectCollab(false)
+  }, [proxyAddress])
+
+  const updateName = () => {
+    fetchGraphQL(getNameForAddress, 'GetNameForAddress', {
+      address: proxyAddress || acc?.address,
+    }).then(({ data, errors }) => {
+      if (data) {
+        setMintName(data.hic_et_nunc_holder[0].name)
+      }
+    })
+  }
 
   const handleMint = async () => {
 
@@ -274,19 +296,33 @@ export const Mint = () => {
     return true
   }
 
+  // const proxyDisplay = proxyName || proxyAddress
+  // const mintingAs = proxyDisplay || (acc?.name || acc?.address)
+  const flexBetween = classNames(collabStyles.flex, collabStyles.flexBetween)
+
   return (
     <Page title="mint" large>
       {step === 0 && (
         <>
 
-          {proxyAddress && (
+          {/* User has collabs available */}
+          {collabs.length > 0 && (
             <Container>
               <Padding>
-                <p><span style={{ opacity: 0.5 }}>minting as</span> {proxyName || proxyAddress}</p>
+                <div className={flexBetween}>
+                  <p><span style={{ opacity: 0.5 }}>minting as</span> {mintName}</p>
+                  <Button onClick={() => setSelectCollab(!selectCollab)}>
+                    <Purchase>{selectCollab ? 'cancel' : 'change'}</Purchase>
+                  </Button>
+                </div>
               </Padding>
             </Container>
           )}
-          
+
+          {selectCollab && (
+            <CollabContractsOverview showAdminOnly={true} />
+          )}
+
           <Container>
             <Padding>
               <Input

@@ -92,7 +92,6 @@ export const CreateCollaboration = () => {
     const minimalView = !editCollaborators && (showBenefactorsUI || showReview)
     const showCollaboratorsTable = editCollaborators || validCollaborators.length > 0
 
-
     if (!acc) {
         return (
             <Container>
