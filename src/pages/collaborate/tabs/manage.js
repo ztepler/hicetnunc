@@ -13,6 +13,7 @@ export const CollabContractsOverview = ({ showAdminOnly = false }) => {
 
     const { acc, load, originatedContract, originationOpHash, setProxyAddress, setFeedback, findOriginatedContractFromOpHash } = useContext(HicetnuncContext)
     const [collabs, setCollabs] = useState([])
+    const [loadingCollabs, setLoadingCollabs] = useState(true)
     const [showDetail, setShowDetail] = useState(false)
     // const [checkingForOrigination, setCheckingForOrigination] = useState(false)
     const [checkInterval, setCheckInterval] = useState(30)
@@ -49,12 +50,16 @@ export const CollabContractsOverview = ({ showAdminOnly = false }) => {
             return
         }
 
+        setLoadingCollabs(true)
         console.log("Now checking for available collabs")
 
         // On boot, see what addresses the synced address can manage 
         fetchGraphQL(getCollabsForAddress, 'GetCollabs', {
             address: acc.address,
         }).then(({ data, errors }) => {
+            
+            setLoadingCollabs(false)
+            
             if (data) {
                 const shareholderInfo = data.hic_et_nunc_shareholder.map(s => s.split_contract)
                 const allContracts = shareholderInfo || []
@@ -143,7 +148,7 @@ export const CollabContractsOverview = ({ showAdminOnly = false }) => {
                 )}
 
                 {collabs.length === 0 && !originationOpHash && (
-                    <p>{load ? 'Loading...' : 'You aren’t part of any collaborations at the moment'}</p>
+                    <p>{loadingCollabs ? 'Looking for collabs...' : 'You aren’t part of any collaborations at the moment'}</p>
                 )}
 
             </Padding>
