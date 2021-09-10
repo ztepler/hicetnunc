@@ -12,22 +12,15 @@ export const CollaboratorRow = ({ collaborator, onUpdate, onAdd, onRemove, onPas
 
     const [meta, setMeta] = useState()
     const [address, setAddress] = useState(collaborator.address)
-    const [tezAddress, setTezAddress] = useState(collaborator.tezAddress)
+
+    // TODO: implement .tez address resolution
+    // const [tezAddress, setTezAddress] = useState(collaborator.tezAddress)
+
     const [shares, setShares] = useState(collaborator.shares)
     const sharesRef = useRef()
 
     useEffect(() => {
         const { address, shares } = collaborator
-
-        if (address === '' && meta) {
-            setMeta()
-            return
-        }
-
-        if (!meta && address) {
-            GetUserMetadata(address)
-            .then(({ data }) => setMeta(data))
-        }
 
         // if (/^.*\.tez$/.test(address)) {
         //     resolveTezosDomain(address).then(resolvedAddress => {
@@ -39,13 +32,28 @@ export const CollaboratorRow = ({ collaborator, onUpdate, onAdd, onRemove, onPas
         //     setAddress(address)
         // }
         setAddress(address)
-
         setShares(shares)
-    }, [collaborator, meta])
+
+    }, [collaborator])
 
     useEffect(() => {
-        if (validAddress(address) && !shares && sharesRef.current) {
+        const isValid = validAddress(address)
+
+        if (isValid && !shares && sharesRef.current) {
             sharesRef.current.focus();
+        }
+
+        if (isValid) {
+            console.log("valid address, checking meta", meta, address)
+            if (!meta || (meta && meta.tzprofile !== address)) {
+                GetUserMetadata(address)
+                    .then(({ data }) => {
+                        console.log("Data from user meta query", data)
+                        setMeta(data)
+                    })
+            }
+        } else {
+            setMeta()
         }
     }, [address, shares])
 

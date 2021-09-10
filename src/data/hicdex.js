@@ -110,7 +110,6 @@ export const getNameForAddress = `query GetNameForAddress($address: String!) {
 }`
 
 export async function fetchGraphQL(operationsDoc, operationName, variables) {
-  console.log("Looking for", operationsDoc, process.env.REACT_APP_GRAPHQL_API)
   const result = await fetch(
     process.env.REACT_APP_GRAPHQL_API,
     {
