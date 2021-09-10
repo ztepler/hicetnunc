@@ -11,7 +11,11 @@ export const CollaboratorTable = ({ collaborators, setCollaborators, availableSh
 
     // Add collaborator
     const addCollaborator = () => {
-        setCollaborators([...collaborators, { ...collaboratorTemplate }])
+        setCollaborators([
+            ...collaborators, {
+                ...collaboratorTemplate
+            }
+        ])
 
         // If we are in minimal view, go back to full editing mode
         if (minimalView) {
@@ -71,7 +75,7 @@ export const CollaboratorTable = ({ collaborators, setCollaborators, availableSh
                 setCollaborators([{ ...collaboratorTemplate }])
             }
         }
-        
+
     }, [multilineInput, collaborators, setCollaborators, autoSplit, setAutoSplit])
 
     const lastCollab = collaborators[collaborators.length - 1]

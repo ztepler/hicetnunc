@@ -64,8 +64,6 @@ export const BenefactorRow = ({
 
     const benefactorName = meta ? meta.alias : null
     const placeholderText = benefactorName || `address ${!address ? `(tz... or KT...)` : ''}`
-
-    console.log("Benefactor row", onSelectPercentage)
     
     /**
      * In some situations we may want to show less UI information

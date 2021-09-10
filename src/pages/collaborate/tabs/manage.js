@@ -7,21 +7,49 @@ import { CollabParticipantInfo } from '../../../components/collab/manage/CollabP
 import { Button, Purchase, Secondary } from '../../../components/button'
 import classNames from 'classnames'
 import { Input } from '../../../components/input'
+import { CountdownTimer } from '../../../components/collab/manage/CountdownTimer'
 
 export const CollabContractsOverview = ({ showAdminOnly = false }) => {
 
-    const { acc, load, originatedContract, setProxyAddress } = useContext(HicetnuncContext)
+    const { acc, load, originatedContract, originationOpHash, setProxyAddress, setFeedback, findOriginatedContractFromOpHash } = useContext(HicetnuncContext)
     const [collabs, setCollabs] = useState([])
     const [showDetail, setShowDetail] = useState(false)
+    // const [checkingForOrigination, setCheckingForOrigination] = useState(false)
+    const [checkInterval, setCheckInterval] = useState(30)
+    const [timerEndDate, setTimerEndDate] = useState()
 
     // TODO - maybe allow manual input of a KT address
     // const [addAddressManually, setAddAddressManually] = useState(false)
     // const [manualAddress, setManualAddress] = useState('')
 
     useEffect(() => {
+        // const isChecking = originationOpHash && !checkingForOrigination
+        // setCheckingForOrigination(isChecking)
+
+        if (originationOpHash && !timerEndDate) {
+            const timerDate = new Date()
+            timerDate.setTime(timerDate.getTime() + (checkInterval * 1000))
+            setTimerEndDate(timerDate)
+        }
+
+    }, [originationOpHash, timerEndDate])
+
+    // useEffect(() => {
+    //     if (originationOpHash) {
+    //         let timerFunc = setTimeout(() => {
+    //             console.log("Checking for contract")
+    //         }, 10000);
+
+    //         return () => clearTimeout(timerFunc);
+    //     }
+    // }, [originationOpHash])
+
+    useEffect(() => {
         if (!acc) {
             return
         }
+
+        console.log("Now checking for available collabs")
 
         // On boot, see what addresses the synced address can manage 
         fetchGraphQL(getCollabsForAddress, 'GetCollabs', {
@@ -34,13 +62,28 @@ export const CollabContractsOverview = ({ showAdminOnly = false }) => {
                 setCollabs(contractsToShow)
             }
         })
-    }, [acc])
+    }, [acc, originatedContract])
 
     const headerStyle = classNames(styles.flex, styles.flexBetween)
+
+    const _onTimerComplete = () => {
+        findOriginatedContractFromOpHash(originationOpHash)
+        setCheckInterval(10)
+    }
 
     return (
         <Container>
             <Padding>
+                {originationOpHash && timerEndDate && (
+                    <p className={styles.mb3}>Collab contract creation in progress... <CountdownTimer endDate={timerEndDate} onComplete={_onTimerComplete} /></p>
+                )}
+
+                {originatedContract && (
+                    <div className={styles.mb3}>
+                        <p><strong>collaborative contract created successfully!</strong></p>
+                        <p>address: {originatedContract.address}</p>
+                    </div>
+                )}
 
                 {collabs.length > 0 && (
                     <div>
@@ -62,10 +105,10 @@ export const CollabContractsOverview = ({ showAdminOnly = false }) => {
                         </div>
 
                         <ul>
-                            {collabs.map(contract => (
+                            {collabs.map(collab => (
                                 <CollabParticipantInfo
-                                    key={contract.address}
-                                    collabData={contract}
+                                    key={collab.contract.address}
+                                    collabData={collab}
                                     expanded={showDetail}
                                 />
                             ))}
@@ -99,8 +142,8 @@ export const CollabContractsOverview = ({ showAdminOnly = false }) => {
                     </div>
                 )}
 
-                {collabs.length === 0 && (
-                    <p>{originatedContract ? 'Your collab contract is being created... please wait' : (load ? 'Loading...' : 'You aren’t part of any collaborations at the moment')}</p>
+                {collabs.length === 0 && !originationOpHash && (
+                    <p>{load ? 'Loading...' : 'You aren’t part of any collaborations at the moment'}</p>
                 )}
 
             </Padding>

@@ -8,15 +8,15 @@ import { ReviewStage } from '../../../components/collab/create/ReviewStage'
 import styles from '../styles.module.scss'
 import classNames from 'classnames'
 // import { mockData } from '../../../components/collab/constants'
-const mockCoreData = [{
-    address: 'tz1cCkFpkSezV7TpmSBfKzAKADxBUXPjNsJD',
-    shares: 95,
-}]
+// const mockCoreData = [{
+//     address: 'tz1cCkFpkSezV7TpmSBfKzAKADxBUXPjNsJD',
+//     shares: 95,
+// }]
 
-const mockBenefactorData = [{
-    address: 'tz1aPHze1U5BEEKrGYt3dvY6aAQEeiWm8jjK',
-    shares: 5,
-}]
+// const mockBenefactorData = [{
+//     address: 'tz1aPHze1U5BEEKrGYt3dvY6aAQEeiWm8jjK',
+//     shares: 5,
+// }]
 
 export const CreateCollaboration = () => {
 
@@ -106,57 +106,56 @@ export const CreateCollaboration = () => {
             benefactors={benefactors}
             onEdit={() => setShowReview(false)}
         />
-    ) :
-        (
-            <Container>
-                <Padding>
-                    <h1 className={validCollaborators.length === 0 ? styles.mb1 : styles.mb2}>
-                        <strong>core collaborators</strong>
-                    </h1>
+    ) : (
+        <Container>
+            <Padding>
+                <h1 className={showCollaboratorsTable ? styles.mb1 : styles.mb2}>
+                    <strong>core collaborators</strong>
+                </h1>
 
-                    {validCollaborators.length === 0 && showCollaboratorsTable && (
-                        <Fragment>
-                            <p className={notesClass}>Note: shares don’t have to add up to 100% - splits are calculated as proportions of the total shares.</p>
-                            <p className={notesClass}>You can paste multiple addresses to get an auto split</p>
-                        </Fragment>
-                    )}
+                {showCollaboratorsTable && (
+                    <Fragment>
+                        <p className={notesClass}>Note: shares don’t have to add up to 100% - splits are calculated as proportions of the total shares.</p>
+                        <p className={notesClass}>You can paste multiple addresses to get an auto split</p>
+                    </Fragment>
+                )}
 
-                    {showCollaboratorsTable && (
-                        <CollaboratorTable
-                            collaborators={editCollaborators ? collaborators : validCollaborators}
-                            setCollaborators={setCollaborators}
-                            minimalView={minimalView}
-                            onEdit={() => setEditCollaborators(true)}
-                        />
-                    )}
+                {showCollaboratorsTable && (
+                    <CollaboratorTable
+                        collaborators={editCollaborators ? collaborators : validCollaborators}
+                        setCollaborators={setCollaborators}
+                        minimalView={minimalView}
+                        onEdit={() => setEditCollaborators(true)}
+                    />
+                )}
 
-                    {!showCollaboratorsTable && (
-                        <p className={styles.muted}>No core collaborators</p>
-                    )}
+                {!showCollaboratorsTable && (
+                    <p className={styles.muted}>No core collaborators</p>
+                )}
 
-                    {!minimalView && (
-                        <AddCollaboratorsButton
-                            threshold={0}
-                            collaborators={collaborators}
-                            onClick={() => setEditCollaborators(false)}
-                        />
-                    )}
+                {!minimalView && (
+                    <AddCollaboratorsButton
+                        threshold={0}
+                        collaborators={collaborators}
+                        onClick={() => setEditCollaborators(false)}
+                    />
+                )}
 
-                    {showBenefactorsUI && (
-                        <BenefactorsUI
-                            totalParticipants={totalParticipants}
-                            totalShares={totalShares}
-                            benefactors={benefactors}
-                            setBenefactors={setBenefactors}
-                            minimalView={showReview}
-                            onComplete={() => setShowReview(true)}
-                            onSelectPercentage={(index, percentage) => _calculateShares(index, percentage)}
-                        />
-                    )}
+                {showBenefactorsUI && (
+                    <BenefactorsUI
+                        totalParticipants={totalParticipants}
+                        totalShares={totalShares}
+                        benefactors={benefactors}
+                        setBenefactors={setBenefactors}
+                        minimalView={showReview}
+                        onComplete={() => setShowReview(true)}
+                        onSelectPercentage={(index, percentage) => _calculateShares(index, percentage)}
+                    />
+                )}
 
-                </Padding>
+            </Padding>
 
-            </Container>
+        </Container>
 
-        )
+    )
 }

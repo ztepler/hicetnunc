@@ -85,7 +85,8 @@ export const Mint = () => {
       address: proxyAddress || acc?.address,
     }).then(({ data, errors }) => {
       if (data) {
-        setMintName(data.hic_et_nunc_holder[0].name)
+        const holder = data.hic_et_nunc_holder[0]
+        setMintName(holder.name || acc?.address)
       }
     })
   }
@@ -165,6 +166,8 @@ export const Mint = () => {
       // ztepler: I have not understand the difference between acc.address and getAuth here
       //    so I am using acc.address (minterAddress) in both nftCid.address and in mint call
 
+      console.log({minterAddress})
+
       // upload file(s)
       let nftCid
       if (
@@ -198,6 +201,7 @@ export const Mint = () => {
         })
       }
 
+      console.log("Calling mint with", { minterAddress, amount, path: nftCid.path, royalties })
       mint(minterAddress, amount, nftCid.path, royalties)
     }
   }

@@ -33,6 +33,7 @@ export const ossProjects = [
 
 export const collaboratorTemplate = {
   address: '',
+  tezAddress: '',
   shares: undefined,
 }
 

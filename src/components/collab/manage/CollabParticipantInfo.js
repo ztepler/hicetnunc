@@ -33,17 +33,21 @@ export const CollabParticipantInfo = ({ collabData, expanded = false }) => {
     // We'll show the name of the contract if set
     const { name, address } = contract
 
+    const displayName = name || address
+
     return (
         <li className={listStyle} key={address}>
             <div className={styles.fullWidth}>
                 <div className={headerStyle}>
 
-                    {name && (
-                        <h3>
-                            <strong>
-                                <Link to={`${PATH.COLLAB}/${address}`}>{name}</Link>
-                            </strong>
-                        </h3>
+                    {displayName && (
+                        <Fragment>
+                            <h3>
+                                <strong>
+                                    <Link to={`${PATH.COLLAB}/${address}`}>{displayName}</Link>
+                                </strong>
+                            </h3>
+                        </Fragment>
                     )}
 
                     {address !== proxyAddress && isAdmin && (
@@ -58,6 +62,10 @@ export const CollabParticipantInfo = ({ collabData, expanded = false }) => {
                         </Button>
                     )}
                 </div>
+
+                {!name && (
+                    <p>to set the name of this collab, { address !== proxyAddress ? 'sign in and' : ''} visit <Link to='/config' style={{ textDecoration: 'underline' }}>settings</Link></p>
+                )}
 
                 {expanded && (
                     <Fragment>

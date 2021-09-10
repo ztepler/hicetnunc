@@ -15,15 +15,12 @@ export const ReviewStage = ({ collaborators, benefactors, onEdit }) => {
 
     // Proxy contract creation function
     const { originateProxy } = useContext(HicetnuncContext) // use mockProxy instead for fake return data
-    const { mockProxy } = useContext(HicetnuncContext) // use mockProxy instead for fake return data
+    // const { mockProxy } = useContext(HicetnuncContext) // use mockProxy instead for fake return data
 
     const originateContract = async () => {
-        // TODO: need some UI to select admin contract
-        // now using first address as a administrator
-        // const administratorAddress = collaborators[0]['address']
-
         // shares should be object where keys are addresses and
         // values are natural numbers (it is not required to have 100% in the sum)
+        // admin will be the signed in address that creates it
         let participantData = {}
 
         const validCollaborators = collaborators
@@ -50,8 +47,8 @@ export const ReviewStage = ({ collaborators, benefactors, onEdit }) => {
         )
 
         // Call the core blockchain function to create the contract
-        await originateProxy(participantData)
         // await mockProxy(participantData)
+        await originateProxy(participantData)
     }
 
     return (

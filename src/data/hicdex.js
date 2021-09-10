@@ -13,6 +13,7 @@ export const getAvailableCollabAddresses = `query GetCollabContracts($address: S
         shareholder(where: {holder_type: {_eq: "core_participant"}}) {
           holder {
             name
+            address
           }
         }
       }
@@ -109,6 +110,7 @@ export const getNameForAddress = `query GetNameForAddress($address: String!) {
 }`
 
 export async function fetchGraphQL(operationsDoc, operationName, variables) {
+  console.log("Looking for", operationsDoc, process.env.REACT_APP_GRAPHQL_API)
   const result = await fetch(
     process.env.REACT_APP_GRAPHQL_API,
     {

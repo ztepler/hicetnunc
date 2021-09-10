@@ -16,22 +16,16 @@ const Collaborate = () => {
     const [tabIndex, setTabIndex] = useState(0)
     const Tab = TABS[tabIndex].component
 
-    const { proxyAddress, originatedContract } = useContext(HicetnuncContext)
-
-    // console.log("Main Collaborate component - originated contract is", originatedContract)
+    // We watch for this being created so we can change from create to manage
+    const { originationOpHash } = useContext(HicetnuncContext)
 
     // If an address is created, update the tab
     useEffect(() => {
-        if (originatedContract) {
+        console.log({originationOpHash})
+        if (originationOpHash) {
             setTabIndex(0)
         }
-    }, [proxyAddress, originatedContract])
-
-    // TODO: button to free from proxy contract? (that just makes field empty) // Done (SJ)
-    // TODO: create new smart contract form with separate page? // Done (SJ)
-    // TODO: add/remove tokens to contract?
-    // TODO: validate proxy address? // Done (SJ)
-    // TODO: any way to find all contracts that controlled by user pk? // Done (SJ)
+    }, [originationOpHash])
 
     return (
         <Page title="proxy">
