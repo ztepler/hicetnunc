@@ -35,7 +35,7 @@ export const HicetnuncContext = createContext()
 //const Tezos = new TezosToolkit('https://api.tez.ie/rpc/mainnet')
 //const Tezos = new TezosToolkit('https://mainnet-tezos.giganode.io')
 //const Tezos = new TezosToolkit('https://mainnet.smartpy.io')
-const Tezos = new TezosToolkit('https://api.tez.ie/rpc/mainnet')
+const Tezos = new TezosToolkit('https://mainnet.api.tez.ie')
 const Packer = new MichelCodecPacker();
 // storage fee adjustment
 
