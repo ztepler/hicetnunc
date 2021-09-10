@@ -6,6 +6,7 @@ import {
   // BeaconWalletNotInitialized,
 } from '@taquito/beacon-wallet'
 import { TezosToolkit, OpKind, MichelsonMap } from '@taquito/taquito'
+import { MichelCodecPacker } from "@taquito/taquito";
 import { Parser, Expr } from "@taquito/michel-codec";
 import { Schema } from "@taquito/michelson-encoder";
 import { setItem } from '../utils/storage'
@@ -35,6 +36,7 @@ export const HicetnuncContext = createContext()
 //const Tezos = new TezosToolkit('https://mainnet-tezos.giganode.io')
 //const Tezos = new TezosToolkit('https://mainnet.smartpy.io')
 const Tezos = new TezosToolkit('https://api.tez.ie/rpc/mainnet')
+const Packer = new MichelCodecPacker();
 // storage fee adjustment
 
 /* export class PatchedBeaconWallet extends BeaconWallet {
@@ -855,7 +857,7 @@ class HicetnuncContextProviderClass extends Component {
         console.log("packDataParams", packDataParams);
 
         // Pack hex data for origination call
-        const { packed } = await Tezos.rpc.packData(packDataParams);
+        const { packed } = await Packer.packData(packDataParams);
 
         // Blockchain ops
         await Tezos.wallet
