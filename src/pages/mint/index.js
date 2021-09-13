@@ -67,8 +67,10 @@ export const Mint = () => {
       address: acc?.address,
     }).then(({ data, errors }) => {
       if (data) {
-        const shareholderInfo = data.hic_et_nunc_shareholder.map(s => s.split_contract);
-        setCollabs(shareholderInfo || [])
+        // const shareholderInfo = data.hic_et_nunc_shareholder.map(s => s.split_contract);
+        // setCollabs(shareholderInfo || [])
+        const managedCollabs = data.hic_et_nunc_splitcontract
+        setCollabs(managedCollabs || [])
       }
     })
 
@@ -81,12 +83,14 @@ export const Mint = () => {
   }, [proxyAddress])
 
   const updateName = () => {
+    const currentAddress = proxyAddress || acc?.address
+
     fetchGraphQL(getNameForAddress, 'GetNameForAddress', {
-      address: proxyAddress || acc?.address,
+      address: currentAddress,
     }).then(({ data, errors }) => {
       if (data) {
         const holder = data.hic_et_nunc_holder[0]
-        setMintName(holder.name || acc?.address)
+        setMintName(holder.name || currentAddress)
       }
     })
   }

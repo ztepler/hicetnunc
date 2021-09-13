@@ -6,16 +6,17 @@ import { fetchGraphQL, getCollabsForAddress } from '../../../data/hicdex'
 import { CollabParticipantInfo } from '../../../components/collab/manage/CollabParticipantInfo'
 import { Button, Purchase, Secondary } from '../../../components/button'
 import classNames from 'classnames'
-import { Input } from '../../../components/input'
+// import { Input } from '../../../components/input'
 import { CountdownTimer } from '../../../components/collab/manage/CountdownTimer'
+import { CollabList } from '../../../components/collab/manage/CollabList'
 
 export const CollabContractsOverview = ({ showAdminOnly = false }) => {
 
-    const { acc, load, originatedContract, originationOpHash, setProxyAddress, setFeedback, findOriginatedContractFromOpHash } = useContext(HicetnuncContext)
+    const { acc, originatedContract, originationOpHash, findOriginatedContractFromOpHash } = useContext(HicetnuncContext)
     const [collabs, setCollabs] = useState([])
+    // const [managedCollabs, setManagedCollabs] = useState([])
     const [loadingCollabs, setLoadingCollabs] = useState(true)
-    const [showDetail, setShowDetail] = useState(false)
-    // const [checkingForOrigination, setCheckingForOrigination] = useState(false)
+
     const [checkInterval, setCheckInterval] = useState(30)
     const [timerEndDate, setTimerEndDate] = useState()
 
@@ -35,16 +36,6 @@ export const CollabContractsOverview = ({ showAdminOnly = false }) => {
 
     }, [originationOpHash, timerEndDate])
 
-    // useEffect(() => {
-    //     if (originationOpHash) {
-    //         let timerFunc = setTimeout(() => {
-    //             console.log("Checking for contract")
-    //         }, 10000);
-
-    //         return () => clearTimeout(timerFunc);
-    //     }
-    // }, [originationOpHash])
-
     useEffect(() => {
         if (!acc) {
             return
@@ -57,19 +48,21 @@ export const CollabContractsOverview = ({ showAdminOnly = false }) => {
         fetchGraphQL(getCollabsForAddress, 'GetCollabs', {
             address: acc.address,
         }).then(({ data, errors }) => {
-            
+
             setLoadingCollabs(false)
-            
+
             if (data) {
-                const shareholderInfo = data.hic_et_nunc_shareholder.map(s => s.split_contract)
-                const allContracts = shareholderInfo || []
-                const contractsToShow = showAdminOnly ? allContracts.filter(contract => contract.administrator === acc.address) : allContracts
-                setCollabs(contractsToShow)
+                const allCollabs = data.hic_et_nunc_splitcontract || []
+                const adminCollabs = allCollabs.filter(c => c.administrator === acc.address)
+                const participantCollabs = allCollabs.filter(c => c.administrator !== acc.address)
+
+                // Show admin followed by participant
+                const availableCollabs = showAdminOnly ? allCollabs.filter(c => c.administrator === acc.address) : [...adminCollabs, ...participantCollabs]
+                
+                setCollabs(availableCollabs)
             }
         })
     }, [acc, originatedContract])
-
-    const headerStyle = classNames(styles.flex, styles.flexBetween)
 
     const _onTimerComplete = () => {
         findOriginatedContractFromOpHash(originationOpHash)
@@ -91,61 +84,18 @@ export const CollabContractsOverview = ({ showAdminOnly = false }) => {
                 )}
 
                 {collabs.length > 0 && (
-                    <div>
-                        <div className={headerStyle}>
-                            {showAdminOnly && (
-                                <p className={styles.mb1}>You can mint with these collab contracts:</p>
-
-                            )}
-
-                            {!showAdminOnly && (
-                                <p className={styles.mb1}>You are a participant in these collabs:</p>
-                            )}
-
-                            <div className={styles.mb2}>
-                                <Button onClick={() => setShowDetail(!showDetail)}>
-                                    <Purchase>{showDetail ? 'less detail' : 'more detail'}</Purchase>
-                                </Button>
-                            </div>
-                        </div>
-
-                        <ul>
-                            {collabs.map(collab => (
-                                <CollabParticipantInfo
-                                    key={collab.contract.address}
-                                    collabData={collab}
-                                    expanded={showDetail}
-                                />
-                            ))}
-                        </ul>
-
-                        {/* {!addAddressManually && (
-                            <Button onClick={() => setAddAddressManually(true)}>
-                                <Secondary>
-                                    add address manually
-                                </Secondary>
-                            </Button>
-                        )}
-
-                        {addAddressManually && (
-                            <div className={headerStyle}>
-                                <Input
-                                    type="text"
-                                    label="KT address"
-                                    onChange={event => setManualAddress(event.target.value)}
-                                    placeholder="KT..."
-                                    value={manualAddress}
-                                    autoFocus={true}
-                                />
-                                <Button onClick={() => setProxyAddress(manualAddress)}>
-                                    <Purchase>
-                                        sign in
-                                    </Purchase>
-                                </Button>
-                            </div>
-                        )} */}
-                    </div>
+                    <CollabList
+                        description={showAdminOnly ? "you can mint with these collab contracts:" : "you are part of these collab contracts:"}
+                        collabs={collabs}
+                    />
                 )}
+
+                {/* {collabs.length > 0 && (
+                    <CollabList
+                        description="You are a participant in these collabs:"
+                        collabs={collabs}
+                    />
+                )} */}
 
                 {collabs.length === 0 && !originationOpHash && (
                     <p>{loadingCollabs ? 'Looking for collabs...' : 'You aren’t part of any collaborations at the moment'}</p>

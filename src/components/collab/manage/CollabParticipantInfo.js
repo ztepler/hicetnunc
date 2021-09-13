@@ -63,7 +63,7 @@ export const CollabParticipantInfo = ({ collabData, expanded = false }) => {
                     )}
                 </div>
 
-                {!name && (
+                {!name && isAdmin && (
                     <p>to set the name of this collab, { address !== proxyAddress ? 'sign in and' : ''} visit <Link to='/config' style={{ textDecoration: 'underline' }}>settings</Link></p>
                 )}
 

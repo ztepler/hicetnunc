@@ -83,22 +83,42 @@ export const getCollabTokensForAddress = `query GetCollabTokens($address: String
   }
 }`
 
-export const getCollabsForAddress = `query GetCollabs($address: String!) {
-  hic_et_nunc_shareholder(where: {holder_id: {_eq: $address}, holder_type: {_eq: "core_participant"}}) {
-    split_contract {
-      contract {
-        address
-        name
-      }
-      administrator
+export const getManagedCollabs = `query GetManagedCollabs($address: String!) {
+  hic_et_nunc_splitcontract(where: {administrator: {_eq: $address}}) {
+    id
+    contract {
+      address
+      description
+      name
+    }
+    administrator
       shareholder {
         shares
         holder {
           name
           address
         }
-        holder_type
+      holder_type
+    }
+  }
+}`
+
+export const getCollabsForAddress = `query GetCollabs($address: String!) {
+  hic_et_nunc_splitcontract(where: {_or: [{administrator: {_eq: $address}}, {shareholder: {holder_id: {_eq: $address}}}]}) {
+    id
+    contract {
+      address
+      description
+      name
+    }
+    administrator
+    shareholder {
+      shares
+      holder {
+        name
+        address
       }
+      holder_type
     }
   }
 }`

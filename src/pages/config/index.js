@@ -72,20 +72,29 @@ export class Config extends Component {
 
   componentWillMount = async () => {
     await this.context.syncTaquito()
-    this.setState({ address: this.context.acc.address })
-    let res = await fetchTz(this.context.acc.address)
+
+    const address = this.context.proxyAddress || this.context.acc.address
+
+    console.log("in config", this.context.proxyAddress)
+
+    this.setState({ address })
+    let res = await fetchTz(address)
 
     this.context.subjktInfo = res[0]
-    console.log(this.context.subjktInfo)
+    console.log("subjktInfo", this.context.subjktInfo)
 
     if (this.context.subjktInfo) {
-      let cid = await axios.get('https://ipfs.io/ipfs/' + (this.context.subjktInfo.metadata_file).split('//')[1]).then(res => res.data)
 
-      this.context.subjktInfo.gravatar = cid
+      if (this.context.subjktInfo.metadata_file) {
+        let cid = await axios.get('https://ipfs.io/ipfs/' + (this.context.subjktInfo.metadata_file).split('//')[1]).then(res => res.data)
+  
+        this.context.subjktInfo.gravatar = cid
+  
+        if (cid.description) this.setState({ description: cid.description })
+        if (cid.identicon) this.setState({ identicon: cid.identicon })
+        if (this.context.subjktInfo.name) this.setState({ subjkt: this.context.subjktInfo.name })
+      }
 
-      if (cid.description) this.setState({ description: cid.description })
-      if (cid.identicon) this.setState({ identicon: cid.identicon })
-      if (this.context.subjktInfo.name) this.setState({ subjkt: this.context.subjktInfo.name })
 
     }
     //console.log(this.context.subjktInfo)

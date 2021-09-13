@@ -7,6 +7,7 @@ import { AddCollaboratorsButton } from '../../../components/collab/create/AddCol
 import { ReviewStage } from '../../../components/collab/create/ReviewStage'
 import styles from '../styles.module.scss'
 import classNames from 'classnames'
+import { Button, Secondary } from '../../../components/button'
 // import { mockData } from '../../../components/collab/constants'
 // const mockCoreData = [{
 //     address: 'tz1cCkFpkSezV7TpmSBfKzAKADxBUXPjNsJD',
@@ -130,7 +131,11 @@ export const CreateCollaboration = () => {
                 )}
 
                 {!showCollaboratorsTable && (
-                    <p className={styles.muted}>No core collaborators</p>
+                    <p className={styles.muted}>
+                        <Button onClick={() => setEditCollaborators(true)}>
+                            <Secondary>No core collaborators - click to add</Secondary>
+                        </Button>
+                    </p>
                 )}
 
                 {!minimalView && (
